@@ -13,6 +13,7 @@
 		4BA93FC82C86B7B400973198 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4BA93FC72C86B7B400973198 /* Preview Assets.xcassets */; };
 		4BB21AA62C86D48300C1DEDE /* AddWorkoutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BB21AA52C86D48300C1DEDE /* AddWorkoutView.swift */; };
 		4BB21AA82C86D4BC00C1DEDE /* Data.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BB21AA72C86D4BC00C1DEDE /* Data.swift */; };
+		4BB21AAA2C86E11300C1DEDE /* KeyboardToolbar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BB21AA92C86E11300C1DEDE /* KeyboardToolbar.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -23,6 +24,7 @@
 		4BA93FC72C86B7B400973198 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		4BB21AA52C86D48300C1DEDE /* AddWorkoutView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddWorkoutView.swift; sourceTree = "<group>"; };
 		4BB21AA72C86D4BC00C1DEDE /* Data.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Data.swift; sourceTree = "<group>"; };
+		4BB21AA92C86E11300C1DEDE /* KeyboardToolbar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardToolbar.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -58,6 +60,7 @@
 				4BA93FC02C86B7B300973198 /* FitnessTrackerApp.swift */,
 				4BA93FC22C86B7B300973198 /* ContentView.swift */,
 				4BB21AA52C86D48300C1DEDE /* AddWorkoutView.swift */,
+				4BB21AA92C86E11300C1DEDE /* KeyboardToolbar.swift */,
 				4BA93FC42C86B7B400973198 /* Assets.xcassets */,
 				4BA93FC62C86B7B400973198 /* Preview Content */,
 				4BB21AA72C86D4BC00C1DEDE /* Data.swift */,
@@ -144,6 +147,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				4BA93FC32C86B7B300973198 /* ContentView.swift in Sources */,
+				4BB21AAA2C86E11300C1DEDE /* KeyboardToolbar.swift in Sources */,
 				4BB21AA62C86D48300C1DEDE /* AddWorkoutView.swift in Sources */,
 				4BA93FC12C86B7B300973198 /* FitnessTrackerApp.swift in Sources */,
 				4BB21AA82C86D4BC00C1DEDE /* Data.swift in Sources */,

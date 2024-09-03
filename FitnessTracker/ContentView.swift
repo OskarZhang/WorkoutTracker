@@ -15,7 +15,7 @@ struct ContentView: View {
                     }
                     .onDelete(perform: deleteWorkouts)
                 }
-                .navigationTitle("Fitness Tracker")
+                .navigationTitle("Excercises")
                 
                 VStack {
                     Spacer()
