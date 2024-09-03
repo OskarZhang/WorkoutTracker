@@ -46,6 +46,16 @@ struct AddWorkoutView: View {
                 }
                 
                 DatePicker("Date", selection: $workoutDate, displayedComponents: .date)
+                
+                
+                Button{ saveWorkout() } label: {
+                    Text("Save").padding()
+                }
+                    .foregroundStyle(.white)
+                    .background(.tint)
+                    .clipShape(Capsule())
+                    .frame(maxWidth: .infinity, alignment: .center)
+                    
             }
             .keyboardToolbar {
                 Group {
@@ -85,10 +95,7 @@ struct AddWorkoutView: View {
                 .padding(EdgeInsets(top: 0, leading: 0, bottom: 16, trailing: 0))
             }
             .navigationTitle("Add Workout")
-            .navigationBarItems(
-                leading: Button("Cancel") { isPresented = false },
-                trailing: Button("Save") { saveWorkout() }
-            )
+            .navigationBarTitleDisplayMode(.large)
         }
     }
     
@@ -117,6 +124,17 @@ struct AddWorkoutView: View {
     
     private func matchWorkout(text: String) -> [Workout] {
         return workouts.filter { $0.name.lowercased().contains(text.lowercased())}
+            .reduce((uniqueWorkoutNames: Set<String>(), list: [Workout]())) { partialResult, workout in
+                if (partialResult.uniqueWorkoutNames.contains(workout.name)) {
+                    return partialResult
+                }
+                var uniqueNames = partialResult.uniqueWorkoutNames
+                var list = partialResult.list
+                list.append(workout)
+                uniqueNames.insert(workout.name)
+                return (uniqueNames, list)
+            }
+            .list
     }
 }
 
