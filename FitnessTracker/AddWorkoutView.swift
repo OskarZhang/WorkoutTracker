@@ -18,6 +18,7 @@ struct AddWorkoutView: View {
     @State private var repCount = 5
     @State private var setCount = 5
     @State private var workoutDate = Date()
+    @FocusState private var isNameFocused
     @FocusState private var isWeightTextFieldFocused
     
     var body: some View {
@@ -25,11 +26,24 @@ struct AddWorkoutView: View {
             List {
                 TextField("Workout Name", text: $workoutName)
                     .autocorrectionDisabled(true)
+                    .focused($isNameFocused)
+                    .onAppear(perform: {
+                        isNameFocused = true
+                    })
+                    .onSubmit {
+                        isWeightTextFieldFocused = true
+                    }
+                    
                 .pickerStyle(SegmentedPickerStyle())
                 
                 TextField("Weight (lbs)", text: $weight)
                     .keyboardType(.numberPad)
                     .focused($isWeightTextFieldFocused)
+                    .onSubmit {
+                        if (!workoutName.isEmpty && !weight.isEmpty) {
+                            saveWorkout()
+                        }
+                    }
                 Stepper("Reps: \(repCount)", value: $repCount, in: 1...100)
                 Stepper("Sets: \(setCount)", value: $setCount, in: 1...10)
             
@@ -107,6 +121,7 @@ struct AddWorkoutView: View {
                                         self.repCount = repCount
                                         self.setCount = setCount
                                         self.workoutName = workout.name
+                                        self.isWeightTextFieldFocused = true
                                     }
                                 }
                             }
@@ -120,6 +135,7 @@ struct AddWorkoutView: View {
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button("Save") { saveWorkout() }
+                        .disabled(weight.isEmpty || workoutName.isEmpty)
                 }
             }
         }
@@ -161,30 +177,5 @@ struct AddWorkoutView: View {
             return []
         }
         return finalList
-    }
-}
-
-
-struct WorkoutRow: View {
-    let workout: Workout
-    
-    var body: some View {
-        VStack(alignment: .leading) {
-            Text(workout.name)
-                .font(.headline)
-            
-            switch workout.type {
-            case .strength(let weight, let repCount, let setCount):
-                Text("Strength: \(weight)lbs, \(repCount) reps, \(setCount) sets")
-                    .font(.subheadline)
-            case .cardio(let durationMinutes):
-                Text("Cardio: \(durationMinutes) minutes")
-                    .font(.subheadline)
-            }
-            
-            Text(workout.date, style: .date)
-                .font(.caption)
-                .foregroundColor(.secondary)
-        }
     }
 }

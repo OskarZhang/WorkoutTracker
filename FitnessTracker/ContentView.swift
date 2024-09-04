@@ -37,8 +37,7 @@ struct ContentView: View {
             }
         }
         .sheet(isPresented: $isAddingWorkout) {
-            AddWorkoutView(isPresented: $isAddingWorkout, modelContext: modelContext)
-                .presentationDetents([.medium,.large])
+            AddWorkoutView(isPresented: $isAddingWorkout, modelContext: modelContext)                
         }
     }
     
@@ -48,6 +47,32 @@ struct ContentView: View {
                 print("deleting index \(index)")
                 modelContext.delete(workouts[index])
             }
+        }
+    }
+}
+
+
+
+struct WorkoutRow: View {
+    let workout: Workout
+    
+    var body: some View {
+        VStack(alignment: .leading) {
+            Text(workout.name)
+                .font(.headline)
+            
+            switch workout.type {
+            case .strength(let weight, let repCount, let setCount):
+                Text("\(weight) lbs, \(repCount) reps, \(setCount) sets")
+                    .font(.subheadline)
+            case .cardio(let durationMinutes):
+                Text("Cardio: \(durationMinutes) minutes")
+                    .font(.subheadline)
+            }
+            
+            Text(workout.date, style: .date)
+                .font(.caption)
+                .foregroundColor(.secondary)
         }
     }
 }
