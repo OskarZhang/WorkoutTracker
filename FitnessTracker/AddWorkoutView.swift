@@ -14,8 +14,6 @@ struct AddWorkoutView: View {
     
     @Query private var workouts: [Workout]
     @State private var workoutName = ""
-    @State private var workoutType = 1 // 0 for cardio, 1 for strength
-    @State private var durationMinutes = 30
     @State private var weight = ""
     @State private var repCount = 5
     @State private var setCount = 5
@@ -24,63 +22,86 @@ struct AddWorkoutView: View {
     
     var body: some View {
         NavigationView {
-            Form {
+            List {
                 TextField("Workout Name", text: $workoutName)
                     .autocorrectionDisabled(true)
-                
-                Picker("Workout Type", selection: $workoutType) {
-                    Text("Strength").tag(1)
-                    Text("Cardio").tag(0)
-                }
                 .pickerStyle(SegmentedPickerStyle())
                 
-                if workoutType == 0 {
-                    Stepper("Duration: \(durationMinutes) minutes", value: $durationMinutes, in: 1...180)
-                } else {
-                    TextField("Weight (lbs)", text: $weight)
-                        .keyboardType(.numberPad)
-                        .focused($isWeightTextFieldFocused)
-                    Stepper("Reps: \(repCount)", value: $repCount, in: 1...100)
-                    Stepper("Sets: \(setCount)", value: $setCount, in: 1...10)
-
-                }
-                
+                TextField("Weight (lbs)", text: $weight)
+                    .keyboardType(.numberPad)
+                    .focused($isWeightTextFieldFocused)
+                Stepper("Reps: \(repCount)", value: $repCount, in: 1...100)
+                Stepper("Sets: \(setCount)", value: $setCount, in: 1...10)
+            
                 DatePicker("Date", selection: $workoutDate, displayedComponents: .date)
                 
-                
-                Button{ saveWorkout() } label: {
-                    Text("Save").padding()
-                }
-                    .foregroundStyle(.white)
-                    .background(.tint)
-                    .clipShape(Capsule())
-                    .frame(maxWidth: .infinity, alignment: .center)
-                    
             }
+            .listStyle(.plain)
             .keyboardToolbar {
                 Group {
                     if (isWeightTextFieldFocused) {
-                        HStack {
-                            Button("+10 lbs") {
+                        HStack(alignment: .bottom, spacing: 16) {
+                            Spacer()
+                            Button {
                                 addWeight(additionalWeight: 10)
+                            } label: {
+                                VStack(alignment: .center) {
+                                    Spacer()
+                                    Image(.barbell)
+                                        .resizable()
+                                        .scaledToFit()
+                                        .frame(width: 20, height: 20)
+                                    Text("10 lbs")
+                                        .lineLimit(1)
+                                        .foregroundStyle(.black)
+                                        .fixedSize(horizontal: true, vertical: false)
+                                }
                             }
-                            Button("+25 lbs") {
+                            .fixedSize(horizontal: false, vertical: /*@START_MENU_TOKEN@*/true/*@END_MENU_TOKEN@*/)
+                            Button {
                                 addWeight(additionalWeight: 25)
+                            } label: {
+                                VStack(alignment: .center) {
+                                    Spacer()
+                                    Image(.barbell)
+                                        .resizable()
+                                        .scaledToFit()
+                                        .frame(width: 25, height: 25)
+                                    Text("25 lbs")
+                                        .lineLimit(1)
+                                        .foregroundStyle(.black)
+                                        .fixedSize(horizontal: true, vertical: false)
+                                }
                             }
-                            Button("+45 lbs") {
+                            .fixedSize(horizontal: false, vertical: /*@START_MENU_TOKEN@*/true/*@END_MENU_TOKEN@*/)
+                            Button {
                                 addWeight(additionalWeight: 45)
+                            } label: {
+                                VStack(alignment: .center) {
+                                    Spacer()
+                                    Image(.barbell)
+                                        .resizable()
+                                        .scaledToFit()
+                                        .frame(width: 45, height: 45)
+                                    Text("45 lbs")
+                                        .lineLimit(1)
+                                        .foregroundStyle(.black)
+                                        .fixedSize(horizontal: true, vertical: false)
+                                }
                             }
-                            Button(LocalizedStringKey(""), systemImage: "clear") {
-                                weight = ""
-                            }
+                            .fixedSize(horizontal: false, vertical: /*@START_MENU_TOKEN@*/true/*@END_MENU_TOKEN@*/)
+                            Spacer()
                         }
+                        .background(.white)
+                        .frame(maxWidth: .infinity)
+                        .shadow(radius: 0.3)
                     } else {
                         HStack {
                             ForEach(matchWorkout(text: workoutName)) { workout in
                                 Button(workout.name) {
                                     switch workout.type {
-                                    case .cardio(let durationMinutes):
-                                        self.durationMinutes = durationMinutes
+                                    case .cardio(_):
+                                        break
                                     case .strength(let weight, let repCount, let setCount):
                                         self.weight = "\(weight)"
                                         self.repCount = repCount
@@ -95,20 +116,21 @@ struct AddWorkoutView: View {
                 .padding(EdgeInsets(top: 0, leading: 0, bottom: 16, trailing: 0))
             }
             .navigationTitle("Add Workout")
-            .navigationBarTitleDisplayMode(.large)
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button("Save") { saveWorkout() }
+                }
+            }
         }
     }
     
     private func saveWorkout() {
         let workoutType: WorkoutType
-        if self.workoutType == 0 {
-            workoutType = .cardio(durationMinutes: durationMinutes)
-        } else {
-            let weightInt = Int(weight) ?? 0
-            let repCountInt = repCount
-            let setCountInt = setCount
-            workoutType = .strength(weight: weightInt, repCount: repCountInt, setCount: setCountInt)
-        }
+        let weightInt = Int(weight) ?? 0
+        let repCountInt = repCount
+        let setCountInt = setCount
+        workoutType = .strength(weight: weightInt, repCount: repCountInt, setCount: setCountInt)
         
         let newWorkout = Workout(name: workoutName, type: workoutType, date: workoutDate)
         modelContext.insert(newWorkout)

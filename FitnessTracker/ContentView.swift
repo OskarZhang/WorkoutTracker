@@ -10,9 +10,10 @@ struct ContentView: View {
         NavigationView {
             ZStack {
                 List {
-                    ForEach(workouts.sorted(by: { $0.date > $1.date })) { workout in
-                        WorkoutRow(workout: workout)
-                    }
+                    ForEach(workouts) { workout in
+                        NavigationLink(destination: WorkoutDetailView(workout: workout)) {
+                            WorkoutRow(workout: workout)
+                        }                    }
                     .onDelete(perform: deleteWorkouts)
                 }
                 .navigationTitle("Excercises")
@@ -37,13 +38,14 @@ struct ContentView: View {
         }
         .sheet(isPresented: $isAddingWorkout) {
             AddWorkoutView(isPresented: $isAddingWorkout, modelContext: modelContext)
-                .presentationDetents([.medium])
+                .presentationDetents([.medium,.large])
         }
     }
     
     private func deleteWorkouts(offsets: IndexSet) {
         withAnimation {
             for index in offsets {
+                print("deleting index \(index)")
                 modelContext.delete(workouts[index])
             }
         }
