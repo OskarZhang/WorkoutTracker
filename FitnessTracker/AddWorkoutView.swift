@@ -97,7 +97,7 @@ struct AddWorkoutView: View {
                         .shadow(radius: 0.3)
                     } else {
                         HStack {
-                            ForEach(matchWorkout(text: workoutName)) { workout in
+                            ForEach(suggestWorkoutNames(text: workoutName)) { workout in
                                 Button(workout.name) {
                                     switch workout.type {
                                     case .cardio(_):
@@ -131,8 +131,7 @@ struct AddWorkoutView: View {
         let repCountInt = repCount
         let setCountInt = setCount
         workoutType = .strength(weight: weightInt, repCount: repCountInt, setCount: setCountInt)
-        
-        let newWorkout = Workout(name: workoutName, type: workoutType, date: workoutDate)
+        let newWorkout = Workout(name: workoutName.replacingOccurrences(of: "\\s+$", with: "", options: .regularExpression), type: workoutType, date: workoutDate)
         modelContext.insert(newWorkout)
         
         isPresented = false
@@ -144,8 +143,8 @@ struct AddWorkoutView: View {
         weight = String(curWeight)
     }
     
-    private func matchWorkout(text: String) -> [Workout] {
-        return workouts.filter { $0.name.lowercased().contains(text.lowercased())}
+    private func suggestWorkoutNames(text: String) -> [Workout] {
+        let finalList = (text.isEmpty ? Array(workouts.prefix(10)) : workouts.filter { $0.name.lowercased().contains(text.lowercased())})
             .reduce((uniqueWorkoutNames: Set<String>(), list: [Workout]())) { partialResult, workout in
                 if (partialResult.uniqueWorkoutNames.contains(workout.name)) {
                     return partialResult
@@ -157,6 +156,11 @@ struct AddWorkoutView: View {
                 return (uniqueNames, list)
             }
             .list
+        if (finalList.count == 1 && text == finalList.first?.name) {
+            // no need to provide suggestions for the exact match
+            return []
+        }
+        return finalList
     }
 }
 
