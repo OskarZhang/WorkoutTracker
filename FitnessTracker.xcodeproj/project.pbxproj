@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		4B9F71D82CA4F81D009706C6 /* CSVExporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9F71D72CA4F81D009706C6 /* CSVExporter.swift */; };
+		4B9F71DA2CA4F9E5009706C6 /* CSVImporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9F71D92CA4F9E5009706C6 /* CSVImporter.swift */; };
 		4BA93FC12C86B7B300973198 /* FitnessTrackerApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BA93FC02C86B7B300973198 /* FitnessTrackerApp.swift */; };
 		4BA93FC32C86B7B300973198 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BA93FC22C86B7B300973198 /* ContentView.swift */; };
 		4BA93FC52C86B7B400973198 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4BA93FC42C86B7B400973198 /* Assets.xcassets */; };
@@ -18,6 +20,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		4B9F71D72CA4F81D009706C6 /* CSVExporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CSVExporter.swift; sourceTree = "<group>"; };
+		4B9F71D92CA4F9E5009706C6 /* CSVImporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CSVImporter.swift; sourceTree = "<group>"; };
 		4BA93FBD2C86B7B300973198 /* FitnessTracker.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FitnessTracker.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		4BA93FC02C86B7B300973198 /* FitnessTrackerApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FitnessTrackerApp.swift; sourceTree = "<group>"; };
 		4BA93FC22C86B7B300973198 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -59,6 +63,7 @@
 		4BA93FBF2C86B7B300973198 /* FitnessTracker */ = {
 			isa = PBXGroup;
 			children = (
+				4B9F71D72CA4F81D009706C6 /* CSVExporter.swift */,
 				4BA93FC02C86B7B300973198 /* FitnessTrackerApp.swift */,
 				4BA93FC22C86B7B300973198 /* ContentView.swift */,
 				4BB21AA52C86D48300C1DEDE /* AddWorkoutView.swift */,
@@ -67,6 +72,7 @@
 				4BA93FC42C86B7B400973198 /* Assets.xcassets */,
 				4BA93FC62C86B7B400973198 /* Preview Content */,
 				4BB21AA72C86D4BC00C1DEDE /* Data.swift */,
+				4B9F71D92CA4F9E5009706C6 /* CSVImporter.swift */,
 			);
 			path = FitnessTracker;
 			sourceTree = "<group>";
@@ -151,8 +157,10 @@
 			files = (
 				4BA93FC32C86B7B300973198 /* ContentView.swift in Sources */,
 				4BB21AAE2C8813E300C1DEDE /* WorkoutDetailView.swift in Sources */,
+				4B9F71DA2CA4F9E5009706C6 /* CSVImporter.swift in Sources */,
 				4BB21AAA2C86E11300C1DEDE /* KeyboardToolbar.swift in Sources */,
 				4BB21AA62C86D48300C1DEDE /* AddWorkoutView.swift in Sources */,
+				4B9F71D82CA4F81D009706C6 /* CSVExporter.swift in Sources */,
 				4BA93FC12C86B7B300973198 /* FitnessTrackerApp.swift in Sources */,
 				4BB21AA82C86D4BC00C1DEDE /* Data.swift in Sources */,
 			);

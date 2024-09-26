@@ -3,7 +3,7 @@ import SwiftData
 
 struct ContentView: View {
     @Environment(\.modelContext) private var modelContext
-    @Query private var workouts: [Workout]
+    @Query(sort: \Workout.date, order: .reverse) private var workouts: [Workout]
     @State private var isAddingWorkout = false
     
     var body: some View {
