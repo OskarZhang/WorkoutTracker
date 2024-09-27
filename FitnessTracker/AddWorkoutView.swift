@@ -110,22 +110,29 @@ struct AddWorkoutView: View {
                         .frame(maxWidth: .infinity)
                         .shadow(radius: 0.3)
                     } else {
-                        HStack {
-                            ForEach(suggestWorkoutNames(text: workoutName)) { workout in
-                                Button(workout.name) {
-                                    switch workout.type {
-                                    case .cardio(_):
-                                        break
-                                    case .strength(let weight, let repCount, let setCount):
-                                        self.weight = "\(weight)"
-                                        self.repCount = repCount
-                                        self.setCount = setCount
-                                        self.workoutName = workout.name
-                                        self.isWeightTextFieldFocused = true
+                        ScrollView(.horizontal, showsIndicators: false) {
+                            HStack(alignment: .bottom, spacing: 16) {
+                                ForEach(suggestWorkoutNames(text: workoutName)) { workout in
+                                    Button {
+                                        switch workout.type {
+                                        case .cardio(_):
+                                            break
+                                        case .strength(let weight, let repCount, let setCount):
+                                            self.weight = "\(weight)"
+                                            self.repCount = repCount
+                                            self.setCount = setCount
+                                            self.workoutName = workout.name
+                                            self.isWeightTextFieldFocused = true
+                                        }
+                                    } label: {
+                                        Text(workout.name)
+                                            .lineLimit(1)
                                     }
+                                    .fixedSize(horizontal: true, vertical: /*@START_MENU_TOKEN@*/true/*@END_MENU_TOKEN@*/)
                                 }
                             }
                         }
+                        .padding(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
                     }
                 }
                 .padding(EdgeInsets(top: 0, leading: 0, bottom: 16, trailing: 0))
