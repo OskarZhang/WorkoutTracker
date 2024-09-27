@@ -12,7 +12,7 @@ struct AddWorkoutView: View {
     @Binding var isPresented: Bool
     let modelContext: ModelContext
     
-    @Query private var workouts: [Workout]
+    @Query(sort: \Workout.date, order: .reverse) private var workouts: [Workout]
     @State private var workoutName = ""
     @State private var weight = ""
     @State private var repCount = 5
@@ -20,6 +20,9 @@ struct AddWorkoutView: View {
     @State private var workoutDate = Date()
     @FocusState private var isNameFocused
     @FocusState private var isWeightTextFieldFocused
+    
+    @Environment(\.colorScheme) var colorScheme
+
     
     var body: some View {
         NavigationView {
@@ -67,7 +70,7 @@ struct AddWorkoutView: View {
                                         .frame(width: 20, height: 20)
                                     Text("10 lbs")
                                         .lineLimit(1)
-                                        .foregroundStyle(.black)
+                                        .foregroundStyle(colorScheme == .dark ? Color.white : Color.black)
                                         .fixedSize(horizontal: true, vertical: false)
                                 }
                             }
@@ -83,7 +86,7 @@ struct AddWorkoutView: View {
                                         .frame(width: 25, height: 25)
                                     Text("25 lbs")
                                         .lineLimit(1)
-                                        .foregroundStyle(.black)
+                                        .foregroundStyle(colorScheme == .dark ? Color.white : Color.black)
                                         .fixedSize(horizontal: true, vertical: false)
                                 }
                             }
@@ -99,14 +102,13 @@ struct AddWorkoutView: View {
                                         .frame(width: 45, height: 45)
                                     Text("45 lbs")
                                         .lineLimit(1)
-                                        .foregroundStyle(.black)
+                                        .foregroundStyle(colorScheme == .dark ? Color.white : Color.black)
                                         .fixedSize(horizontal: true, vertical: false)
                                 }
                             }
                             .fixedSize(horizontal: false, vertical: /*@START_MENU_TOKEN@*/true/*@END_MENU_TOKEN@*/)
                             Spacer()
                         }
-                        .background(.white)
                         .frame(maxWidth: .infinity)
                         .shadow(radius: 0.3)
                     } else {
