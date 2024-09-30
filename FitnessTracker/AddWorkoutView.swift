@@ -8,16 +8,26 @@
 import SwiftUI
 import SwiftData
 
+struct AddWorkoutViewModel {
+    var workoutName = ""
+    var weight = ""
+    var repCount = 5
+    var setCount = 5
+    var workoutDate = Date()
+}
+
 struct AddWorkoutView: View {
+    
+    init(isPresented: Binding<Bool>, modelContext: ModelContext) {
+        self._isPresented = isPresented
+        self.modelContext = modelContext
+    }
+    
     @Binding var isPresented: Bool
     let modelContext: ModelContext
     
     @Query(sort: \Workout.date, order: .reverse) private var workouts: [Workout]
-    @State private var workoutName = ""
-    @State private var weight = ""
-    @State private var repCount = 5
-    @State private var setCount = 5
-    @State private var workoutDate = Date()
+    @State private var viewModel: AddWorkoutViewModel = .init()
     @FocusState private var isNameFocused
     @FocusState private var isWeightTextFieldFocused
     
@@ -27,7 +37,7 @@ struct AddWorkoutView: View {
     var body: some View {
         NavigationView {
             List {
-                TextField("Workout Name", text: $workoutName)
+                TextField("Workout Name", text: $viewModel.workoutName)
                     .autocorrectionDisabled(true)
                     .focused($isNameFocused)
                     .onAppear(perform: {
@@ -39,18 +49,18 @@ struct AddWorkoutView: View {
                     
                 .pickerStyle(SegmentedPickerStyle())
                 
-                TextField("Weight (lbs)", text: $weight)
+                TextField("Weight (lbs)", text: $viewModel.weight)
                     .keyboardType(.numberPad)
                     .focused($isWeightTextFieldFocused)
                     .onSubmit {
-                        if (!workoutName.isEmpty && !weight.isEmpty) {
+                        if (!viewModel.workoutName.isEmpty && !viewModel.weight.isEmpty) {
                             saveWorkout()
                         }
                     }
-                Stepper("Reps: \(repCount)", value: $repCount, in: 1...100)
-                Stepper("Sets: \(setCount)", value: $setCount, in: 1...10)
+                Stepper("Reps: \(viewModel.repCount)", value: $viewModel.repCount, in: 1...100)
+                Stepper("Sets: \(viewModel.setCount)", value: $viewModel.setCount, in: 1...10)
             
-                DatePicker("Date", selection: $workoutDate, displayedComponents: .date)
+                DatePicker("Date", selection: $viewModel.workoutDate, displayedComponents: .date)
                 
             }
             .listStyle(.plain)
@@ -114,16 +124,16 @@ struct AddWorkoutView: View {
                     } else {
                         ScrollView(.horizontal, showsIndicators: false) {
                             HStack(alignment: .bottom, spacing: 16) {
-                                ForEach(suggestWorkoutNames(text: workoutName)) { workout in
+                                ForEach(suggestWorkoutNames(text: viewModel.workoutName)) { workout in
                                     Button {
                                         switch workout.type {
                                         case .cardio(_):
                                             break
                                         case .strength(let weight, let repCount, let setCount):
-                                            self.weight = "\(weight)"
-                                            self.repCount = repCount
-                                            self.setCount = setCount
-                                            self.workoutName = workout.name
+                                            self.viewModel.weight = "\(weight)"
+                                            self.viewModel.repCount = repCount
+                                            self.viewModel.setCount = setCount
+                                            self.viewModel.workoutName = workout.name
                                             self.isWeightTextFieldFocused = true
                                         }
                                     } label: {
@@ -144,7 +154,7 @@ struct AddWorkoutView: View {
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button("Save") { saveWorkout() }
-                        .disabled(weight.isEmpty || workoutName.isEmpty)
+                        .disabled(viewModel.weight.isEmpty || viewModel.workoutName.isEmpty)
                 }
             }
         }
@@ -152,20 +162,20 @@ struct AddWorkoutView: View {
     
     private func saveWorkout() {
         let workoutType: WorkoutType
-        let weightInt = Int(weight) ?? 0
-        let repCountInt = repCount
-        let setCountInt = setCount
+        let weightInt = Int(viewModel.weight) ?? 0
+        let repCountInt = viewModel.repCount
+        let setCountInt = viewModel.setCount
         workoutType = .strength(weight: weightInt, repCount: repCountInt, setCount: setCountInt)
-        let newWorkout = Workout(name: workoutName.replacingOccurrences(of: "\\s+$", with: "", options: .regularExpression), type: workoutType, date: workoutDate)
+        let newWorkout = Workout(name: viewModel.workoutName.replacingOccurrences(of: "\\s+$", with: "", options: .regularExpression), type: workoutType, date: viewModel.workoutDate)
         modelContext.insert(newWorkout)
         
         isPresented = false
     }
     
     private func addWeight(additionalWeight: Int) {
-        var curWeight = Int(weight) ?? 0
+        var curWeight = Int(viewModel.weight) ?? 0
         curWeight += additionalWeight
-        weight = String(curWeight)
+        viewModel.weight = String(curWeight)
     }
     
     private func suggestWorkoutNames(text: String) -> [Workout] {
