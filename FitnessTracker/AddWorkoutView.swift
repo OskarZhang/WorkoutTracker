@@ -69,54 +69,9 @@ struct AddWorkoutView: View {
                     if (isWeightTextFieldFocused) {
                         HStack(alignment: .bottom, spacing: 16) {
                             Spacer()
-                            Button {
-                                addWeight(additionalWeight: 10)
-                            } label: {
-                                VStack(alignment: .center) {
-                                    Spacer()
-                                    Image(.barbell)
-                                        .resizable()
-                                        .scaledToFit()
-                                        .frame(width: 20, height: 20)
-                                    Text("10 lbs")
-                                        .lineLimit(1)
-                                        .foregroundStyle(colorScheme == .dark ? Color.white : Color.black)
-                                        .fixedSize(horizontal: true, vertical: false)
-                                }
-                            }
-                            .fixedSize(horizontal: false, vertical: /*@START_MENU_TOKEN@*/true/*@END_MENU_TOKEN@*/)
-                            Button {
-                                addWeight(additionalWeight: 25)
-                            } label: {
-                                VStack(alignment: .center) {
-                                    Spacer()
-                                    Image(.barbell)
-                                        .resizable()
-                                        .scaledToFit()
-                                        .frame(width: 25, height: 25)
-                                    Text("25 lbs")
-                                        .lineLimit(1)
-                                        .foregroundStyle(colorScheme == .dark ? Color.white : Color.black)
-                                        .fixedSize(horizontal: true, vertical: false)
-                                }
-                            }
-                            .fixedSize(horizontal: false, vertical: /*@START_MENU_TOKEN@*/true/*@END_MENU_TOKEN@*/)
-                            Button {
-                                addWeight(additionalWeight: 45)
-                            } label: {
-                                VStack(alignment: .center) {
-                                    Spacer()
-                                    Image(.barbell)
-                                        .resizable()
-                                        .scaledToFit()
-                                        .frame(width: 45, height: 45)
-                                    Text("45 lbs")
-                                        .lineLimit(1)
-                                        .foregroundStyle(colorScheme == .dark ? Color.white : Color.black)
-                                        .fixedSize(horizontal: true, vertical: false)
-                                }
-                            }
-                            .fixedSize(horizontal: false, vertical: /*@START_MENU_TOKEN@*/true/*@END_MENU_TOKEN@*/)
+                            dumbbellButton(weight: 10)
+                            dumbbellButton(weight: 25)
+                            dumbbellButton(weight: 45)
                             Spacer()
                         }
                         .frame(maxWidth: .infinity)
@@ -158,6 +113,25 @@ struct AddWorkoutView: View {
                 }
             }
         }
+    }
+    
+    private func dumbbellButton(weight: Int) -> some View {
+        return Button {
+            addWeight(additionalWeight: weight)
+        } label: {
+            VStack(alignment: .center) {
+                Spacer()
+                Image(.barbell)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: max(20.0, CGFloat(weight)), height: max(20.0, CGFloat(weight)))
+                Text("\(weight) lbs")
+                    .lineLimit(1)
+                    .foregroundStyle(colorScheme == .dark ? Color.white : Color.black)
+                    .fixedSize(horizontal: true, vertical: false)
+            }
+        }
+        .fixedSize(horizontal: false, vertical: /*@START_MENU_TOKEN@*/true/*@END_MENU_TOKEN@*/)
     }
     
     private func saveWorkout() {
