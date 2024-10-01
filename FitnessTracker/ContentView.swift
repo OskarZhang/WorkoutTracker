@@ -4,12 +4,26 @@ import SwiftData
 struct ContentView: View {
     @Environment(\.modelContext) private var modelContext
     @Query(filter: recentFilter() ,sort: \Workout.date, order: .reverse) private var workouts: [Workout]
+    
+    var groupedWorkouts: [(date: Date, workouts: [Workout])] {
+        let groupedDict = Dictionary(grouping: workouts) { workout in
+            // Normalize the date to remove time components
+            Calendar.current.startOfDay(for: workout.date)
+        }
+        // Sort the dates in descending order
+        let sortedDates = groupedDict.keys.sorted(by: >)
+        // Map the sorted dates to an array of tuples
+        return sortedDates.map { date in
+            (date: date, workouts: groupedDict[date]!)
+        }
+    }
+    
     @State private var isAddingWorkout = false
     @State private var showingSettings = false
     @State private var showingImportFileSelector = false
 
     @State private var isShareSheetPresented: Bool = false
-    @State private var csvFileURL: URL?
+    @State private var exportedCSVFileURL: URL?
     @State private var showErrorAlert: Bool = false
     @State private var errorMessage: String = ""
 
@@ -17,11 +31,16 @@ struct ContentView: View {
         NavigationView {
             ZStack {
                 List {
-                    ForEach(workouts) { workout in
-                        NavigationLink(destination: WorkoutDetailView(workout: workout)) {
-                            WorkoutRow(workout: workout)
-                        }                    }
-                    .onDelete(perform: deleteWorkouts)
+                    ForEach(groupedWorkouts, id: \.date) { group in
+                        Section(header: Text(ContentView.formattedDate(group.date))) {
+                            ForEach(group.workouts) { workout in
+                                NavigationLink(destination: WorkoutDetailView(workout: workout)) {
+                                    WorkoutRow(workout: workout)
+                                }
+                            }
+                            .onDelete(perform: deleteWorkouts)
+                        }
+                    }
                 }
                 .navigationTitle("Excercises")
                 .toolbar {
@@ -38,7 +57,7 @@ struct ContentView: View {
                     }
                     
                     
-                    if let csvURL = csvFileURL {
+                    if let csvURL = exportedCSVFileURL {
                         ShareLink(item: csvURL) {
                             Label("Export", systemImage: "square.and.arrow.up")
                                 .font(.title2)
@@ -124,11 +143,6 @@ struct ContentView: View {
         }
     }
     
-    static func recentFilter() -> Predicate<Workout> {
-        let recentCutOffDate = Date().addingTimeInterval(-7 * 24 * 60 * 60)
-        return #Predicate<Workout> { $0.date >= recentCutOffDate}
-    }
-    
     /// Function to export workouts to CSV and prepare the shareable file
     private func exportAndPrepareShare() {
         let exporter = CSVExporter()
@@ -143,7 +157,7 @@ struct ContentView: View {
             // Write the CSV string to the temporary file
             try csvString.write(to: fileURL, atomically: true, encoding: .utf8)
             // Update the state to trigger ShareSheet
-            csvFileURL = fileURL
+            exportedCSVFileURL = fileURL
             
         } catch {
             print("Failed to write CSV file: \(error.localizedDescription)")
@@ -151,6 +165,25 @@ struct ContentView: View {
             showErrorAlert = true
         }
     }
+    
+    private static func recentFilter() -> Predicate<Workout> {
+        let recentCutOffDate = Date().addingTimeInterval(-7 * 24 * 60 * 60)
+        return #Predicate<Workout> { $0.date >= recentCutOffDate}
+    }
+    
+    private static func formattedDate(_ date: Date) -> String {
+        let calendar = Calendar.current
+        if calendar.isDateInToday(date) {
+            return "Today"
+        } else if calendar.isDateInYesterday(date) {
+            return "Yesterday"
+        } else {
+            let formatter = DateFormatter()
+            formatter.dateStyle = .medium // You can choose .short, .medium, .long, or .full
+            return formatter.string(from: date)
+        }
+    }
+
 
 }
 
@@ -172,10 +205,6 @@ struct WorkoutRow: View {
                 Text("Cardio: \(durationMinutes) minutes")
                     .font(.subheadline)
             }
-            
-            Text(workout.date, style: .date)
-                .font(.caption)
-                .foregroundColor(.secondary)
         }
     }
 }
