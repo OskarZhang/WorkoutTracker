@@ -3,7 +3,7 @@ import SwiftData
 
 struct ContentView: View {
     @Environment(\.modelContext) private var modelContext
-    @Query(sort: \Workout.date, order: .reverse) private var workouts: [Workout]
+    @Query(filter: recentFilter() ,sort: \Workout.date, order: .reverse) private var workouts: [Workout]
     @State private var isAddingWorkout = false
     @State private var showingSettings = false
     @State private var showingImportFileSelector = false
@@ -122,6 +122,11 @@ struct ContentView: View {
         } catch {
             print("Failed to import CSV: \(error.localizedDescription)")
         }
+    }
+    
+    static func recentFilter() -> Predicate<Workout> {
+        let recentCutOffDate = Date().addingTimeInterval(-7 * 24 * 60 * 60)
+        return #Predicate<Workout> { $0.date >= recentCutOffDate}
     }
     
     /// Function to export workouts to CSV and prepare the shareable file
