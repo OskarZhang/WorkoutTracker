@@ -11,12 +11,12 @@ struct ContentView: View {
         TabView {
             ExercisesListView()
                 .tabItem {
-                    Image(systemName: "list.bullet")
+                    Image(systemName: "dumbbell")
                     Text("Exercises")
                 }
             TrendsView()
                 .tabItem {
-                    Image(systemName: "chart.bar")
+                    Image(systemName: "chart.xyaxis.line")
                     Text("Trends")
             }
         }

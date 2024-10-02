@@ -183,8 +183,6 @@ struct ExercisesListView: View {
             return formatter.string(from: date)
         }
     }
-
-
 }
 
 

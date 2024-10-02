@@ -30,21 +30,20 @@ struct TrendsView: View {
     var body: some View {
         NavigationView {
             List(workoutNameStats, id: \.name) { item in
-                HStack {
-                    VStack(alignment: .leading) {
-                        Text(item.name)
-                            .font(.headline)
-                        Text("Last performed on \(formattedDate(item.recentDate))")
-                            .font(.subheadline)
-                            .foregroundColor(.secondary)
-                        WorkoutChartView(item.name)
-                            .frame(height: 300)
-                    }
-                    Spacer()
-                    Text("\(item.count)")
+                VStack(alignment: .leading, spacing: 8) {
+                    Text(item.name)
+                        .font(.largeTitle)
+                    Text("Last on \(formattedDate(item.recentDate))")
+                        .font(.subheadline)
                         .foregroundColor(.secondary)
+                    WorkoutChartView(item.name)
+                        .frame(height: 200)
                 }
+                .padding()
+                .listRowSeparator(.hidden)
             }
+            .listStyle(.plain)
+            
             .navigationTitle("Trends")
         }
     }
