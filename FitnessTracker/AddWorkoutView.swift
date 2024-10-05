@@ -7,6 +7,7 @@
 
 import SwiftUI
 import SwiftData
+import SwiftUIIntrospect
 
 struct AddWorkoutViewModel {
     var workoutName = ""
@@ -31,6 +32,8 @@ struct AddWorkoutView: View {
     @FocusState private var isNameFocused
     @FocusState private var isWeightTextFieldFocused
     
+    @State private var hasSetInitialFocus = false
+    
     @Environment(\.colorScheme) var colorScheme
 
     
@@ -40,14 +43,20 @@ struct AddWorkoutView: View {
                 TextField("Workout Name", text: $viewModel.workoutName)
                     .autocorrectionDisabled(true)
                     .focused($isNameFocused)
-                    .onAppear(perform: {
-                        isNameFocused = true
+                    .introspect(.textField, on: .iOS(.v13, .v14, .v15, .v16, .v17, .v18), customize: { textField in
+                        if (!hasSetInitialFocus && isPresented) {
+                            textField.becomeFirstResponder()
+                            hasSetInitialFocus = true
+                        }
                     })
+                    .onAppear {
+                        isNameFocused = true
+                    }
                     .onSubmit {
                         isWeightTextFieldFocused = true
                     }
-                    
-                .pickerStyle(SegmentedPickerStyle())
+                
+                    .pickerStyle(SegmentedPickerStyle())
                 
                 TextField("Weight (lbs)", text: $viewModel.weight)
                     .keyboardType(.numberPad)
@@ -59,7 +68,6 @@ struct AddWorkoutView: View {
                     }
                 Stepper("Reps: \(viewModel.repCount)", value: $viewModel.repCount, in: 1...100)
                 Stepper("Sets: \(viewModel.setCount)", value: $viewModel.setCount, in: 1...10)
-            
                 DatePicker("Date", selection: $viewModel.workoutDate, displayedComponents: .date)
                 
             }
