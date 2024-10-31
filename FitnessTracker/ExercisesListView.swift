@@ -19,6 +19,7 @@ struct ExercisesListView: View {
     }
     
     @State private var isAddingWorkout = false
+    @State private var isPresentingExperimentalAdd = false
     @State private var showingSettings = false
     @State private var showingImportFileSelector = false
 
@@ -56,7 +57,6 @@ struct ExercisesListView: View {
                         print("tapped")
                     }
                     
-                    
                     if let csvURL = exportedCSVFileURL {
                         ShareLink(item: csvURL) {
                             Label("Export", systemImage: "square.and.arrow.up")
@@ -68,6 +68,10 @@ struct ExercisesListView: View {
                         }
                     } else {
                         EmptyView()
+                    }
+                    
+                    Button("Experimental Add") {
+                        isPresentingExperimentalAdd = true
                     }
                 }
                 .fileImporter(isPresented: $showingImportFileSelector, allowedContentTypes: [.item], allowsMultipleSelection: false) { result in
@@ -99,8 +103,12 @@ struct ExercisesListView: View {
             }
         }
         .sheet(isPresented: $isAddingWorkout) {
-            AddWorkoutView(isPresented: $isAddingWorkout, modelContext: modelContext)                
+            AddWorkoutView(isPresented: $isAddingWorkout, modelContext: modelContext)
         }
+        .sheet(isPresented: $isPresentingExperimentalAdd) {
+            Representable().presentationDetents([.height(100)])
+        }
+
     }
     
     private func deleteWorkouts(offsets: IndexSet) {

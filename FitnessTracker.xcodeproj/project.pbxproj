@@ -22,6 +22,9 @@
 		4BB21AA82C86D4BC00C1DEDE /* Data.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BB21AA72C86D4BC00C1DEDE /* Data.swift */; };
 		4BB21AAA2C86E11300C1DEDE /* KeyboardToolbar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BB21AA92C86E11300C1DEDE /* KeyboardToolbar.swift */; };
 		4BB21AAE2C8813E300C1DEDE /* WorkoutDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BB21AAD2C8813E300C1DEDE /* WorkoutDetailView.swift */; };
+		4BF3492F2CCEFD0C00891FAE /* LogWorkoutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BF3492E2CCEFCFD00891FAE /* LogWorkoutView.swift */; };
+		4BF349312CCF0B5A00891FAE /* InputView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BF349302CCF0B5300891FAE /* InputView.swift */; };
+		4BF349332CCF12E100891FAE /* InputViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BF349322CCF12DD00891FAE /* InputViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -52,6 +55,9 @@
 		4BB21AA72C86D4BC00C1DEDE /* Data.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Data.swift; sourceTree = "<group>"; };
 		4BB21AA92C86E11300C1DEDE /* KeyboardToolbar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardToolbar.swift; sourceTree = "<group>"; };
 		4BB21AAD2C8813E300C1DEDE /* WorkoutDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutDetailView.swift; sourceTree = "<group>"; };
+		4BF3492E2CCEFCFD00891FAE /* LogWorkoutView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogWorkoutView.swift; sourceTree = "<group>"; };
+		4BF349302CCF0B5300891FAE /* InputView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InputView.swift; sourceTree = "<group>"; };
+		4BF349322CCF12DD00891FAE /* InputViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InputViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -86,6 +92,8 @@
 		4BA93FBF2C86B7B300973198 /* FitnessTracker */ = {
 			isa = PBXGroup;
 			children = (
+				4BF349302CCF0B5300891FAE /* InputView.swift */,
+				4BF349322CCF12DD00891FAE /* InputViewController.swift */,
 				4B9F71D72CA4F81D009706C6 /* CSVExporter.swift */,
 				4BA93FC02C86B7B300973198 /* FitnessTrackerApp.swift */,
 				4B31DA252CACC0A0005B3984 /* ContentView.swift */,
@@ -93,6 +101,7 @@
 				4BA93FC22C86B7B300973198 /* ExercisesListView.swift */,
 				4BB21AA52C86D48300C1DEDE /* AddWorkoutView.swift */,
 				4BB21AA92C86E11300C1DEDE /* KeyboardToolbar.swift */,
+				4BF3492E2CCEFCFD00891FAE /* LogWorkoutView.swift */,
 				4BB21AAD2C8813E300C1DEDE /* WorkoutDetailView.swift */,
 				4B31DA292CACC2F5005B3984 /* WorkoutChartView.swift */,
 				4BA93FC42C86B7B400973198 /* Assets.xcassets */,
@@ -185,8 +194,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4BF349312CCF0B5A00891FAE /* InputView.swift in Sources */,
 				4B31DA282CACC17A005B3984 /* TrendsView.swift in Sources */,
 				4BA93FC32C86B7B300973198 /* ExercisesListView.swift in Sources */,
+				4BF349332CCF12E100891FAE /* InputViewController.swift in Sources */,
 				4BB21AAE2C8813E300C1DEDE /* WorkoutDetailView.swift in Sources */,
 				4B9F71DA2CA4F9E5009706C6 /* CSVImporter.swift in Sources */,
 				4BB21AAA2C86E11300C1DEDE /* KeyboardToolbar.swift in Sources */,
@@ -196,6 +207,7 @@
 				4BA93FC12C86B7B300973198 /* FitnessTrackerApp.swift in Sources */,
 				4BB21AA82C86D4BC00C1DEDE /* Data.swift in Sources */,
 				4B31DA2A2CACC2FA005B3984 /* WorkoutChartView.swift in Sources */,
+				4BF3492F2CCEFD0C00891FAE /* LogWorkoutView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
