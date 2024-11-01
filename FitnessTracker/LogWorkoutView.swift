@@ -121,31 +121,32 @@ extension SliderView: UICollectionViewDelegate, UICollectionViewDelegateFlowLayo
         guard let collectionView = (scrollView as? UICollectionView) else {
             return
         }
-        
-        
         if (collectionView.contentSize.width > 0) {
-            var targetContentOffsetX: CGFloat
-            // overscroll territory, next page
-            if (collectionView.contentOffset.x + collectionView.bounds.width - cellWidth / 2.0 >= collectionView.contentSize.width) {
+            var targetContentOffsetX: CGFloat = collectionView.contentOffset.x
+            let viewWidth = collectionView.bounds.width / 2.0
+            let contentWidth = collectionView.contentSize.width / 2.0
+            
+            // one page away and half a cell away, bump page up
+            let nextPageOffsetThreshold = contentWidth - viewWidth - cellWidth / 2.0
+            
+            // about to hit 0.0 offset
+            let previousPageOffsetThreshold = cellWidth / 2.0
+            
+            if (collectionView.contentOffset.x >= nextPageOffsetThreshold) {
                 page += 1
-                targetContentOffsetX = collectionView.contentOffset.x + collectionView.bounds.width - collectionView.contentSize.width + cellWidth / 2.0
+                targetContentOffsetX = previousPageOffsetThreshold + collectionView.contentOffset.x - nextPageOffsetThreshold
                 collectionView.contentOffset.x = targetContentOffsetX
-            } else if (collectionView.contentOffset.x <= cellWidth / 2.0 && page > 0) {
+            } else if (collectionView.contentOffset.x <= previousPageOffsetThreshold && page > 0) {
                 page -= 1
-                targetContentOffsetX = collectionView.contentSize.width - collectionView.bounds.width - (cellWidth / 2.0 - collectionView.contentOffset.x)
+                targetContentOffsetX = nextPageOffsetThreshold - (previousPageOffsetThreshold - collectionView.contentOffset.x)
                 collectionView.contentOffset.x = targetContentOffsetX
             } else {
                 targetContentOffsetX = collectionView.contentOffset.x
             }
             
-            // page 0's target offset is a bit different going from -width/2 to index 23 - width / 2
-            let targetIndex = targetIndex(contentOffSetX: targetContentOffsetX) + (page == 0 ? 0 : config.numberOfItems / 2)
-            
-            let value = page * (config.numberOfItems + numOfBufferCells - config.numberOfItems / 2) + targetIndex
-            
-            print("page number: \(page) targetIndex \(targetIndex) \(targetContentOffsetX) \(value) ")
-            currentValueLabel.text = "\(value)"
-            
+            let realOffset = (nextPageOffsetThreshold - previousPageOffsetThreshold) * CGFloat(page) - previousPageOffsetThreshold + targetContentOffsetX
+            let targetIndex = targetIndex(contentOffSetX: realOffset)
+            currentValueLabel.text = "\(targetIndex)"
         }
         
     }
@@ -173,7 +174,7 @@ extension SliderView: UICollectionViewDelegate, UICollectionViewDelegateFlowLayo
         }
         feedbackGenerator.impactOccurred(intensity: 1.0)
     }
-    
+   
 
     private func targetIndex(contentOffSetX: CGFloat) -> Int {
         // we are looking for where the center needle lands, this value should represent how far away the needle is from 0
