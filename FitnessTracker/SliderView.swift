@@ -144,7 +144,7 @@ extension SliderView: UICollectionViewDelegate, UICollectionViewDelegateFlowLayo
                 targetContentOffsetX = collectionView.contentOffset.x
             }
             
-            let realOffset = (nextPageOffsetThreshold - previousPageOffsetThreshold) * CGFloat(page) - previousPageOffsetThreshold + targetContentOffsetX
+            let realOffset = (nextPageOffsetThreshold - previousPageOffsetThreshold) * CGFloat(page)  + targetContentOffsetX
             let targetIndex = targetIndex(contentOffSetX: realOffset)
             currentValueLabel.text = "\(targetIndex)"
         }
@@ -208,14 +208,7 @@ private class SliderCell: UICollectionViewCell {
     override init(frame: CGRect) {
         super.init(frame: frame)
         addSubview(lineView)
-
-//        backgroundColor = .white
         lineView.backgroundColor = .lightGray
-//        lineView.translatesAutoresizingMaskIntoConstraints = false
-//        lineView.widthAnchor.constraint(equalToConstant: 1).isActive = true
-//        lineView.topAnchor.constraint(equalTo: topAnchor).isActive = true
-//        lineView.bottomAnchor.constraint(equalTo: bottomAnchor).isActive = true
-//        lineView.centerXAnchor.constraint(equalTo: centerXAnchor).isActive = true
     }
     
     override func layoutSubviews() {
