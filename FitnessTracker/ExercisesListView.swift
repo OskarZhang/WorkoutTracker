@@ -105,10 +105,6 @@ struct ExercisesListView: View {
         .sheet(isPresented: $isAddingWorkout) {
             AddWorkoutView(isPresented: $isAddingWorkout, modelContext: modelContext)
         }
-        .sheet(isPresented: $isPresentingExperimentalAdd) {
-            InputViewRepresentable().presentationDetents([.height(100)])
-        }
-
     }
     
     private func deleteWorkouts(offsets: IndexSet) {

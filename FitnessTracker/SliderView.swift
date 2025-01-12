@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import SwiftUI
 
 class SliderView: UIView {
     
@@ -30,7 +31,7 @@ class SliderView: UIView {
     private let feedbackGenerator = UIImpactFeedbackGenerator(style: .medium)
     var currentValue: Int = 0 {
         didSet {
-            currentValueLabel.text = "\(String(describing: targetIndex))"
+            currentValueLabel.text = "\(currentValue)"
         }
     }
     private let currentValueLabel: UILabel = {
@@ -83,14 +84,14 @@ class SliderView: UIView {
         addSubview(unitLabel)
         
         NSLayoutConstraint.activate([
-            collectionView.topAnchor.constraint(equalTo: currentValueLabel.bottomAnchor, constant: 10),
+            collectionView.topAnchor.constraint(equalTo: unitLabel.bottomAnchor, constant: 10),
             collectionView.bottomAnchor.constraint(equalTo: bottomAnchor),
             collectionView.leadingAnchor.constraint(equalTo: leadingAnchor),
             collectionView.trailingAnchor.constraint(equalTo: trailingAnchor),
             centerPin.centerXAnchor.constraint(equalTo: centerXAnchor),
-            centerPin.topAnchor.constraint(equalTo: currentValueLabel.bottomAnchor),
+            centerPin.topAnchor.constraint(equalTo: unitLabel.bottomAnchor),
             centerPin.bottomAnchor.constraint(equalTo: bottomAnchor),
-            currentValueLabel.topAnchor.constraint(equalTo: topAnchor),
+            unitLabel.topAnchor.constraint(equalTo: topAnchor),
             currentValueLabel.centerXAnchor.constraint(equalTo: centerXAnchor),
             unitLabel.centerYAnchor.constraint(equalTo: currentValueLabel.centerYAnchor),
             unitLabel.leadingAnchor.constraint(equalTo: currentValueLabel.trailingAnchor)
@@ -150,10 +151,12 @@ extension SliderView: UICollectionViewDelegate, UICollectionViewDelegateFlowLayo
             }
             
             let realOffset = (nextPageOffsetThreshold - previousPageOffsetThreshold) * CGFloat(page)  + targetContentOffsetX
-            currentValue = targetIndex(contentOffSetX: realOffset)
+            let targetIndex = targetIndex(contentOffSetX: realOffset)
+            if (targetIndex >= 0) {
+                currentValue = targetIndex
+            }
             
         }
-        
     }
     
     func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
@@ -196,9 +199,6 @@ extension SliderView: UICollectionViewDataSource {
         return config.numberOfItems + numOfBufferCells
     }
     
-    
-    
-    
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "SliderCell", for: indexPath) as! SliderCell
         return cell
@@ -206,6 +206,23 @@ extension SliderView: UICollectionViewDataSource {
     
 }
 
+extension SliderView {
+    struct Representable: UIViewRepresentable {
+        
+        @Binding var value: Int
+        
+        func makeUIView(context: Context) -> SliderView {
+            return SliderView(config: .init(defaultValue: 35, numberOfItems: 20, unit: "kg"))
+        }
+        func sizeThatFits(_ proposal: ProposedViewSize, uiView: UIView, context: Context) -> CGSize? {
+            return nil
+        }
+        
+        func updateUIView(_ uiView: SliderView, context: Context) {
+            
+        }
+    }
+}
 private class SliderCell: UICollectionViewCell {
     
     private let lineView = UIView()
