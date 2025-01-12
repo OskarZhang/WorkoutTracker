@@ -24,7 +24,6 @@
 		4BB21AAE2C8813E300C1DEDE /* WorkoutDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BB21AAD2C8813E300C1DEDE /* WorkoutDetailView.swift */; };
 		4BF3492F2CCEFD0C00891FAE /* SliderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BF3492E2CCEFCFD00891FAE /* SliderView.swift */; };
 		4BF349312CCF0B5A00891FAE /* InputView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BF349302CCF0B5300891FAE /* InputView.swift */; };
-		4BF349332CCF12E100891FAE /* InputViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BF349322CCF12DD00891FAE /* InputViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -57,7 +56,6 @@
 		4BB21AAD2C8813E300C1DEDE /* WorkoutDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutDetailView.swift; sourceTree = "<group>"; };
 		4BF3492E2CCEFCFD00891FAE /* SliderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SliderView.swift; sourceTree = "<group>"; };
 		4BF349302CCF0B5300891FAE /* InputView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InputView.swift; sourceTree = "<group>"; };
-		4BF349322CCF12DD00891FAE /* InputViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InputViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -93,7 +91,6 @@
 			isa = PBXGroup;
 			children = (
 				4BF349302CCF0B5300891FAE /* InputView.swift */,
-				4BF349322CCF12DD00891FAE /* InputViewController.swift */,
 				4B9F71D72CA4F81D009706C6 /* CSVExporter.swift */,
 				4BA93FC02C86B7B300973198 /* FitnessTrackerApp.swift */,
 				4B31DA252CACC0A0005B3984 /* ContentView.swift */,
@@ -197,7 +194,6 @@
 				4BF349312CCF0B5A00891FAE /* InputView.swift in Sources */,
 				4B31DA282CACC17A005B3984 /* TrendsView.swift in Sources */,
 				4BA93FC32C86B7B300973198 /* ExercisesListView.swift in Sources */,
-				4BF349332CCF12E100891FAE /* InputViewController.swift in Sources */,
 				4BB21AAE2C8813E300C1DEDE /* WorkoutDetailView.swift in Sources */,
 				4B9F71DA2CA4F9E5009706C6 /* CSVImporter.swift in Sources */,
 				4BB21AAA2C86E11300C1DEDE /* KeyboardToolbar.swift in Sources */,

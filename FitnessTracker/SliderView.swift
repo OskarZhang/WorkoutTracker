@@ -28,6 +28,11 @@ class SliderView: UIView {
     private lazy var collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
     
     private let feedbackGenerator = UIImpactFeedbackGenerator(style: .medium)
+    var currentValue: Int = 0 {
+        didSet {
+            currentValueLabel.text = "\(String(describing: targetIndex))"
+        }
+    }
     private let currentValueLabel: UILabel = {
         let label = UILabel()
 
@@ -145,8 +150,8 @@ extension SliderView: UICollectionViewDelegate, UICollectionViewDelegateFlowLayo
             }
             
             let realOffset = (nextPageOffsetThreshold - previousPageOffsetThreshold) * CGFloat(page)  + targetContentOffsetX
-            let targetIndex = targetIndex(contentOffSetX: realOffset)
-            currentValueLabel.text = "\(targetIndex)"
+            currentValue = targetIndex(contentOffSetX: realOffset)
+            
         }
         
     }

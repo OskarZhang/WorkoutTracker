@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import SwiftUI
 
 class InputView: UIView {
     
@@ -13,6 +14,10 @@ class InputView: UIView {
     private let stackView = UIStackView()
     private let sliderView = SliderView(config: .init(defaultValue: 35, numberOfItems: 20, unit: "kg"))
     private let titleLabel = UILabel()
+    
+    var currentValue: Int {
+        return sliderView.currentValue
+    }
     
     init() {
         super.init(frame: .zero)
@@ -41,5 +46,19 @@ class InputView: UIView {
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+}
+
+struct InputViewRepresentable: UIViewRepresentable {
+    
+    func makeUIView(context: Context) -> InputView {
+        return InputView()
+    }
+    func sizeThatFits(_ proposal: ProposedViewSize, uiView: UIView, context: Context) -> CGSize? {
+        return nil
+    }
+    
+    func updateUIView(_ uiView: InputView, context: Context) {
+        
     }
 }

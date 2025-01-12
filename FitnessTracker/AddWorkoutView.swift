@@ -58,19 +58,21 @@ struct AddWorkoutView: View {
                 
                     .pickerStyle(SegmentedPickerStyle())
                 
-                TextField("Weight (lbs)", text: $viewModel.weight)
-                    .keyboardType(.numberPad)
-                    .focused($isWeightTextFieldFocused)
-                    .onSubmit {
-                        if (!viewModel.workoutName.isEmpty && !viewModel.weight.isEmpty) {
-                            saveWorkout()
-                        }
-                    }
+                InputViewRepresentable().frame(height: 100)
+//                TextField("Weight (lbs)", text: $viewModel.weight)
+//                    .keyboardType(.numberPad)
+//                    .focused($isWeightTextFieldFocused)
+//                    .onSubmit {
+//                        if (!viewModel.workoutName.isEmpty && !viewModel.weight.isEmpty) {
+//                            saveWorkout()
+//                        }
+//                    }
                 Stepper("Reps: \(viewModel.repCount)", value: $viewModel.repCount, in: 1...100)
                 Stepper("Sets: \(viewModel.setCount)", value: $viewModel.setCount, in: 1...10)
                 DatePicker("Date", selection: $viewModel.workoutDate, displayedComponents: .date)
                 
             }
+            
             .listStyle(.plain)
             .keyboardToolbar {
                 Group {

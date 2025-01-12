@@ -106,7 +106,7 @@ struct ExercisesListView: View {
             AddWorkoutView(isPresented: $isAddingWorkout, modelContext: modelContext)
         }
         .sheet(isPresented: $isPresentingExperimentalAdd) {
-            Representable().presentationDetents([.height(100)])
+            InputViewRepresentable().presentationDetents([.height(100)])
         }
 
     }
