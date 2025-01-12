@@ -8,6 +8,10 @@
 import UIKit
 import SwiftUI
 
+protocol SliderViewDelegate: AnyObject {
+    func valueDidChange(newValue: Int)
+}
+
 class SliderView: UIView {
     
     struct Config {
@@ -28,12 +32,16 @@ class SliderView: UIView {
     private var layout = UICollectionViewFlowLayout()
     private lazy var collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
     
+    weak var delegate: SliderViewDelegate?
+    
     private let feedbackGenerator = UIImpactFeedbackGenerator(style: .medium)
     var currentValue: Int = 0 {
         didSet {
             currentValueLabel.text = "\(currentValue)"
+            delegate?.valueDidChange(newValue: currentValue)
         }
     }
+
     private let currentValueLabel: UILabel = {
         let label = UILabel()
 
@@ -209,17 +217,34 @@ extension SliderView: UICollectionViewDataSource {
 extension SliderView {
     struct Representable: UIViewRepresentable {
         
+        class Coordinator: NSObject, SliderViewDelegate {
+            var parent: Representable
+            
+            init(_ parent: Representable) {
+                self.parent = parent
+            }
+            
+            func valueDidChange(newValue: Int) {
+                self.parent.value = newValue
+            }
+        }
+        
         @Binding var value: Int
         
         func makeUIView(context: Context) -> SliderView {
-            return SliderView(config: .init(defaultValue: 35, numberOfItems: 20, unit: "kg"))
+            let slider = SliderView(config: .init(defaultValue: 35, numberOfItems: 20, unit: "kg"))
+            slider.delegate = context.coordinator
+            return slider
         }
         func sizeThatFits(_ proposal: ProposedViewSize, uiView: UIView, context: Context) -> CGSize? {
             return nil
         }
         
         func updateUIView(_ uiView: SliderView, context: Context) {
-            
+        }
+        
+        func makeCoordinator() -> Coordinator {
+            return Coordinator(self)
         }
     }
 }

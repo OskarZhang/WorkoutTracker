@@ -111,7 +111,7 @@ struct AddWorkoutView: View {
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button("Save") { saveWorkout() }
-                        .disabled(viewModel.weight >= 0 || viewModel.workoutName.isEmpty)
+                        .disabled(viewModel.weight < 0 || viewModel.workoutName.isEmpty)
                 }
             }
         }

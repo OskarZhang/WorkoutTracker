@@ -103,7 +103,7 @@ struct ExercisesListView: View {
             }
         }
         .sheet(isPresented: $isAddingWorkout) {
-            AddWorkoutView(isPresented: $isAddingWorkout, modelContext: modelContext)
+            AddWorkoutView(isPresented: $isAddingWorkout, modelContext: modelContext).presentationDetents([.medium])
         }
     }
     
