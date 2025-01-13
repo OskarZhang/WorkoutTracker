@@ -43,12 +43,16 @@ class SliderView: UIView {
         let stack = UIStackView()
         stack.translatesAutoresizingMaskIntoConstraints = false
         stack.axis = .horizontal
-        stack.distribution = .equalSpacing
+        stack.distribution = .fillEqually
         stack.alignment = .fill
+        
         return stack
     }()
     
-    private var lastFrameContentOffset: CGPoint?
+    private var lastFrameContentOffsetX: CGFloat?
+    
+    private var xOffset = 0.0
+
     weak var delegate: SliderViewDelegate?
     
     private let feedbackGenerator = UIImpactFeedbackGenerator(style: .medium)
@@ -59,11 +63,13 @@ class SliderView: UIView {
                     debugPrint("new value \(currentValue) old val \(oldValue)")
                 }
                 feedbackGenerator.impactOccurred(intensity: 0.5)
+                currentValueLabel.text = "\(currentValue)"
+                delegate?.valueDidChange(newValue: currentValue)
+
             }
-            currentValueLabel.text = "\(currentValue)"
-            delegate?.valueDidChange(newValue: currentValue)
         }
     }
+    
 
     private let currentValueLabel: UILabel = {
         let label = UILabel()
@@ -92,33 +98,57 @@ class SliderView: UIView {
         return view
     }()
     
+    private var hasSetInitialPosition: Bool = false
+    
+    private var cellWidth: CGFloat {
+        return infiniteScrollView.bounds.width / CGFloat(config.numberOfItems)
+    }
+
+    
     private let config: Config
     init(config: Config) {
         self.config = config
         super.init(frame: .zero)
         
+        assert(config.numberOfItems % 2 != 0, "Please specify an odd number so the center needle can be perfectly.. centered")
         layout.scrollDirection = .horizontal
         
         
+        currentValue = config.defaultValue
         
         layout.minimumInteritemSpacing = 0
         layout.minimumLineSpacing = 0
         
         unitLabel.text = config.unit
-        
+        currentValueLabel.text = "\(currentValue)"
         
         infiniteScrollView.delegate = self
 
         
         
         // make x needles in stack
-        for _ in 0..<config.numberOfItems * 2 {
-            let needle = UIView()
-            needle.backgroundColor = .lightGray
-            needle.translatesAutoresizingMaskIntoConstraints = false
-            needle.widthAnchor.constraint(equalToConstant: 1.0).isActive = true
-            needleStackView.addArrangedSubview(needle)
+        for index in 0..<config.numberOfItems * 3 {
+            let container = UIView()
+            container.translatesAutoresizingMaskIntoConstraints = false
+            container.backgroundColor = .clear
+            
+            if index >= config.numberOfItems / 2 {
+                let needle = UIView()
+                needle.backgroundColor = .lightGray
+                needle.translatesAutoresizingMaskIntoConstraints = false
+                needle.widthAnchor.constraint(equalToConstant: 1.0).isActive = true
+                
+                container.addSubview(needle)
+
+                container.heightAnchor.constraint(equalTo: needle.heightAnchor).isActive = true
+                container.centerXAnchor.constraint(equalTo: needle.centerXAnchor).isActive = true
+                
+            }
+            
+            needleStackView.addArrangedSubview(container)
         }
+        
+
         
         
         infiniteScrollView.addSubview(needleStackView)
@@ -140,7 +170,7 @@ class SliderView: UIView {
             unitLabel.centerYAnchor.constraint(equalTo: currentValueLabel.centerYAnchor),
             unitLabel.leadingAnchor.constraint(equalTo: currentValueLabel.trailingAnchor),
             // layout needle stack inside scrollview
-            needleStackView.widthAnchor.constraint(equalTo: infiniteScrollView.widthAnchor, multiplier: 2.0),
+            needleStackView.widthAnchor.constraint(equalTo: infiniteScrollView.widthAnchor, multiplier: 3.0),
             needleStackView.heightAnchor.constraint(equalTo: infiniteScrollView.heightAnchor),
             needleStackView.leadingAnchor.constraint(equalTo: infiniteScrollView.contentLayoutGuide.leadingAnchor),
             needleStackView.trailingAnchor.constraint(equalTo: infiniteScrollView.contentLayoutGuide.trailingAnchor),
@@ -151,16 +181,22 @@ class SliderView: UIView {
     
     override func layoutSubviews() {
         super.layoutSubviews()
-
-        if (infiniteScrollView.contentInset.left <= 0) {
-            infiniteScrollView.contentInset.left = infiniteScrollView.bounds.width / 2.0
-
+        if !hasSetInitialPosition, infiniteScrollView.bounds.width > 0.0 {
+            hasSetInitialPosition = true
+            
+//            xOffset = (CGFloat(currentValue) + 0.5) * cellWidth
+            
+            
+            // reseved 0 to config.numberOfItems / 2
+            
+//            
+//            let contentOffsetX:CGFloat = 285//infiniteScrollView.bounds.width.truncatingRemainder(dividingBy: (xOffset - cellWidth * CGFloat(config.numberOfItems / 2 + 1)))
+//            debugPrint("initial to be contentOffsetX \(contentOffsetX) xOffset \(xOffset)")
+//            infiniteScrollView.setContentOffset(CGPoint(x: contentOffsetX, y: 0.0), animated: false)
         }
-        
     }
 
-
-
+    
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
@@ -170,192 +206,39 @@ class SliderView: UIView {
 extension SliderView: UIScrollViewDelegate {
     
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
-        // in overscroll buffer zone
         if (scrollView.contentSize.width <= 0) {
             return
         }
-        let leadingInset = scrollView.contentInset.left
-        let normalizedOffsetX = scrollView.contentOffset.x + leadingInset
         
+        debugPrint("contentOffset \(scrollView.contentOffset.x)")
+        if let lastFrameContentOffsetX {
+            xOffset += (scrollView.contentOffset.x - lastFrameContentOffsetX)
+            debugPrint("xOffset \(xOffset)")
+            
+            if (xOffset > 0) {
+                
+                currentValue = Int(floor(xOffset / cellWidth))
+            }
+        }
         
-        // calculate if we passed a needle
-        // there are x needles, and (x - 1) space between needles
-        // total width is scrollView.contentSize
-        // find whether there exists a needle between [lastX, currentX]
+        let contentWidth = scrollView.contentSize.width
+        let offsetX = scrollView.contentOffset.x
         
-        // remove the first or last needle from calculation
-        let cellWidth = (scrollView.contentSize.width - 1.0) / (CGFloat(config.numberOfItems) * 2.0 - 1)
+        if offsetX < (contentWidth / 3) - (scrollView.bounds.width / 2),
+           currentValue >= config.numberOfItems / 2 {
+            lastFrameContentOffsetX = offsetX + (contentWidth / 3)
 
-        if let lastX = lastFrameContentOffset?.x
+            scrollView.contentOffset = CGPoint(x: offsetX + (contentWidth / 3), y: scrollView.contentOffset.y)
+        } else if offsetX > (2 * contentWidth / 3) - (scrollView.bounds.width / 2)
         {
-            
-            if (lastX < scrollView.contentOffset.x) {
-                // going to the right, use floor
-                let oldNeedleIndex = floor((lastX + leadingInset) / cellWidth)
-                let newNeedleIndex = floor(normalizedOffsetX / cellWidth)
-                
-                if (oldNeedleIndex < 0) {
-                    // means we overscrolled
-                    currentValue = 0
-                } else if (newNeedleIndex > oldNeedleIndex) {
-                    currentValue += Int(newNeedleIndex - oldNeedleIndex)
-                }
-            } else if (lastX > scrollView.contentOffset.x) {
-                // going to the left, use ceil
-                let oldNeedleIndex = ceil((lastX + leadingInset) / cellWidth)
-                let newNeedleIndex = ceil(normalizedOffsetX / cellWidth)
-                
-                if (oldNeedleIndex > newNeedleIndex) {
-                    currentValue = max(0, currentValue - Int(oldNeedleIndex) + Int(newNeedleIndex))
-                }
-            }
-            
+            lastFrameContentOffsetX = offsetX - (contentWidth / 3)
+            scrollView.contentOffset = CGPoint(x: offsetX - (contentWidth / 3), y: scrollView.contentOffset.y)
+        } else {
+            lastFrameContentOffsetX = scrollView.contentOffset.x
         }
-        lastFrameContentOffset = scrollView.contentOffset
-
-        if (currentValue < config.numberOfItems / 2 ) {
-            return
-        }
- 
-        // over/underflow adjustment
-        
-        let maxX = scrollView.contentSize.width - leadingInset
-        
-        let minX = leadingInset
-        
-        if (normalizedOffsetX >= maxX) {
-            lastFrameContentOffset?.x = (normalizedOffsetX - maxX)
-            scrollView.contentOffset.x = (normalizedOffsetX - maxX)
-            
-        } else if (normalizedOffsetX <= minX) {
-            lastFrameContentOffset?.x = leadingInset - (minX - normalizedOffsetX)
-            scrollView.contentOffset.x = leadingInset - (minX - normalizedOffsetX)
-        }
-        
-
     }
-    
-//        func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
-//            snapIntoPlace()
-//        }
-//    
-//    
-//        func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
-//            if (!decelerate) {
-//                snapIntoPlace()
-//            }
-//        }
-    
-        private func snapIntoPlace() {
-            
-            let leadingInset = infiniteScrollView.contentInset.left
-            let normalizedOffsetX = infiniteScrollView.contentOffset.x + leadingInset
-            let cellWidth = (infiniteScrollView.contentSize.width - 1.0) / (CGFloat(config.numberOfItems) * 2.0 - 1)
-            
-            let newContentOffset: CGFloat
-            if (currentValue >= config.numberOfItems / 2) {
-                // eg. 10 - 20 / 2 + 1 = 1, 1% 20 = 1
-                let contentOffsetIndex = (currentValue - config.numberOfItems / 2 + 1) % 20
-                newContentOffset = floor(normalizedOffsetX / cellWidth) * cellWidth - leadingInset
-                
-                var calculatedWrong = CGFloat(contentOffsetIndex + config.numberOfItems / 2 - 1) * cellWidth - leadingInset
-                
-                
-                debugPrint("snapping difference \(currentValue): wrong \(contentOffsetIndex) correct \(floor(normalizedOffsetX / cellWidth))")
-            } else {
-                newContentOffset = CGFloat(currentValue) * cellWidth - leadingInset
-            }
-            
-            lastFrameContentOffset = infiniteScrollView.contentOffset
-            
-            
-            UIView.animate(withDuration: 0.2) { [weak self] in
-                self?.infiniteScrollView.contentOffset.x = newContentOffset
-            }
-        }
-    
-    
 }
 
-//extension SliderView: UICollectionViewDelegate, UICollectionViewDelegateFlowLayout {
-//    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-//        return CGSize(width: cellWidth, height: collectionView.frame.height)
-//    }
-//    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
-//        return .zero
-//    }
-//    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumInteritemSpacingForSectionAt section: Int) -> CGFloat {
-//        return 0
-//    }
-//    func scrollViewDidScroll(_ scrollView: UIScrollView) {
-//        guard let collectionView = (scrollView as? UICollectionView) else {
-//            return
-//        }
-//        if (collectionView.contentSize.width > 0) {
-//            var targetContentOffsetX: CGFloat = collectionView.contentOffset.x
-//            let viewWidth = collectionView.bounds.width / 2.0
-//            let contentWidth = collectionView.contentSize.width / 2.0
-//            
-//            // one page away and half a cell away, bump page up
-//            let nextPageOffsetThreshold = contentWidth - viewWidth - cellWidth / 2.0
-//            
-//            // about to hit 0.0 offset
-//            let previousPageOffsetThreshold = cellWidth / 2.0
-//            
-//            if (collectionView.contentOffset.x >= nextPageOffsetThreshold) {
-//                page += 1
-//                targetContentOffsetX = previousPageOffsetThreshold + collectionView.contentOffset.x - nextPageOffsetThreshold
-//                collectionView.contentOffset.x = targetContentOffsetX
-//            } else if (collectionView.contentOffset.x <= previousPageOffsetThreshold && page > 0) {
-//                page -= 1
-//                targetContentOffsetX = nextPageOffsetThreshold - (previousPageOffsetThreshold - collectionView.contentOffset.x)
-//                collectionView.contentOffset.x = targetContentOffsetX
-//            } else {
-//                targetContentOffsetX = collectionView.contentOffset.x
-//            }
-//            
-//            let realOffset = (nextPageOffsetThreshold - previousPageOffsetThreshold) * CGFloat(page)  + targetContentOffsetX
-//            let targetIndex = targetIndex(contentOffSetX: realOffset)
-//            if (targetIndex >= 0) {
-//                currentValue = targetIndex
-//            }
-//            
-//        }
-//    }
-//    
-//    func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
-//        feedbackGenerator.impactOccurred(intensity: 0.5)
-//    }
-//    
-//    
-//    func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
-//        snapIntoPlace()
-//    }
-//    
-//    func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
-//        if (!decelerate) {
-//            snapIntoPlace()
-//        }
-//    }
-//    
-//    private func snapIntoPlace() {
-//        let index = targetIndex(contentOffSetX: collectionView.contentOffset.x)
-//        let snappedContentOffsetX = (CGFloat(index) + 0.5) * cellWidth
-//        UIView.animate(withDuration: 0.2) { [weak self] in
-//            self?.collectionView.contentOffset.x = snappedContentOffsetX - (self?.collectionView.frame.width ?? 0.0) / 2.0
-//        }
-//        feedbackGenerator.impactOccurred(intensity: 1.0)
-//    }
-//   
-//
-//    private func targetIndex(contentOffSetX: CGFloat) -> Int {
-//        // we are looking for where the center needle lands, this value should represent how far away the needle is from 0
-//        let centerXOffset = contentOffSetX + collectionView.frame.width / 2.0
-//        let cellWidth = collectionView.frame.width / CGFloat(config.numberOfItems)
-//
-//        return Int(floor(centerXOffset / cellWidth))
-//    }
-//}
 
 extension SliderView: UICollectionViewDataSource {
     
@@ -388,7 +271,7 @@ extension SliderView {
         @Binding var value: Int
         
         func makeUIView(context: Context) -> SliderView {
-            let slider = SliderView(config: .init(defaultValue: 35, numberOfItems: 20, unit: "kg"))
+            let slider = SliderView(config: .init(defaultValue: 0, numberOfItems: 19, unit: "kg"))
             slider.delegate = context.coordinator
             return slider
         }
