@@ -30,7 +30,6 @@ class SliderView: UIView {
     
     private var page = 0
     private var layout = UICollectionViewFlowLayout()
-//    private lazy var collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
     private let infiniteScrollView = {
         let scrollView = UIScrollView()
         scrollView.translatesAutoresizingMaskIntoConstraints = false
@@ -49,9 +48,9 @@ class SliderView: UIView {
         return stack
     }()
     
-    private var lastFrameContentOffsetX: CGFloat?
+    private var lastFrameContentOffsetX: CGFloat = 0.0
     
-    private var xOffset = 0.0
+    private var realOffsetX: CGFloat = 0.0
 
     weak var delegate: SliderViewDelegate?
     
@@ -59,11 +58,9 @@ class SliderView: UIView {
     var currentValue: Int = 0 {
         didSet {
             if (oldValue != currentValue) {
-                if (abs(oldValue - currentValue) != 1) {
-                    debugPrint("new value \(currentValue) old val \(oldValue)")
-                }
                 feedbackGenerator.impactOccurred(intensity: 0.5)
                 currentValueLabel.text = "\(currentValue)"
+                debugPrint("contentOffSet \(infiniteScrollView.contentOffset.x.truncate(places: 2)) abs contentOffset \(realOffsetX.truncate(places: 2)) value \(currentValue)")
                 delegate?.valueDidChange(newValue: currentValue)
 
             }
@@ -101,7 +98,8 @@ class SliderView: UIView {
     private var hasSetInitialPosition: Bool = false
     
     private var cellWidth: CGFloat {
-        return infiniteScrollView.bounds.width / CGFloat(config.numberOfItems)
+        let width = infiniteScrollView.bounds.width / CGFloat(config.numberOfItems)
+        return width
     }
 
     
@@ -127,23 +125,21 @@ class SliderView: UIView {
         
         
         // make x needles in stack
-        for index in 0..<config.numberOfItems * 3 {
+        for _ in 0..<config.numberOfItems * 3 {
             let container = UIView()
             container.translatesAutoresizingMaskIntoConstraints = false
             container.backgroundColor = .clear
             
-            if index >= config.numberOfItems / 2 {
-                let needle = UIView()
-                needle.backgroundColor = .lightGray
-                needle.translatesAutoresizingMaskIntoConstraints = false
-                needle.widthAnchor.constraint(equalToConstant: 1.0).isActive = true
-                
-                container.addSubview(needle)
+            let needle = UIView()
+            needle.backgroundColor = .lightGray
+            needle.translatesAutoresizingMaskIntoConstraints = false
+            needle.widthAnchor.constraint(equalToConstant: 1.0).isActive = true
+            
+            container.addSubview(needle)
 
-                container.heightAnchor.constraint(equalTo: needle.heightAnchor).isActive = true
-                container.centerXAnchor.constraint(equalTo: needle.centerXAnchor).isActive = true
+            container.heightAnchor.constraint(equalTo: needle.heightAnchor).isActive = true
+            container.centerXAnchor.constraint(equalTo: needle.centerXAnchor).isActive = true
                 
-            }
             
             needleStackView.addArrangedSubview(container)
         }
@@ -184,18 +180,26 @@ class SliderView: UIView {
         if !hasSetInitialPosition, infiniteScrollView.bounds.width > 0.0 {
             hasSetInitialPosition = true
             
-//            xOffset = (CGFloat(currentValue) + 0.5) * cellWidth
+            realOffsetX = CGFloat(currentValue) * cellWidth
             
-            
-            // reseved 0 to config.numberOfItems / 2
-            
-//            
-//            let contentOffsetX:CGFloat = 285//infiniteScrollView.bounds.width.truncatingRemainder(dividingBy: (xOffset - cellWidth * CGFloat(config.numberOfItems / 2 + 1)))
-//            debugPrint("initial to be contentOffsetX \(contentOffsetX) xOffset \(xOffset)")
-//            infiniteScrollView.setContentOffset(CGPoint(x: contentOffsetX, y: 0.0), animated: false)
+            let contentOffsetX:CGFloat = realOffsetX.truncatingRemainder(dividingBy: infiniteScrollView.bounds.width)
+            lastFrameContentOffsetX = contentOffsetX
+            infiniteScrollView.setContentOffset(CGPoint(x: contentOffsetX, y: 0.0), animated: false)
         }
     }
 
+    func updateValue(value: Int) {
+        if (currentValue == value) {
+            return
+        }
+        currentValue = value
+        realOffsetX = CGFloat(currentValue) * cellWidth
+        
+        let contentOffsetX:CGFloat = realOffsetX.truncatingRemainder(dividingBy: infiniteScrollView.bounds.width)
+        lastFrameContentOffsetX = contentOffsetX
+        infiniteScrollView.setContentOffset(CGPoint(x: contentOffsetX, y: 0.0), animated: false)
+
+    }
     
     
     required init?(coder: NSCoder) {
@@ -210,15 +214,25 @@ extension SliderView: UIScrollViewDelegate {
             return
         }
         
-        debugPrint("contentOffset \(scrollView.contentOffset.x)")
-        if let lastFrameContentOffsetX {
-            xOffset += (scrollView.contentOffset.x - lastFrameContentOffsetX)
-            debugPrint("xOffset \(xOffset)")
+        realOffsetX += (scrollView.contentOffset.x - lastFrameContentOffsetX)
+        
+        // 0.5 is half of the width for the center needle
+        currentValue = max(0, Int(floor((realOffsetX + 0.5) / cellWidth)))
+        
+        if (realOffsetX <= 0.0) {
+                lastFrameContentOffsetX = 0.0
+                realOffsetX = 0.0
             
-            if (xOffset > 0) {
-                
-                currentValue = Int(floor(xOffset / cellWidth))
+            if scrollView.contentOffset.x < 0.0 {
+                UIView.animate(withDuration: 0.3) {
+                    // snap it back to 0
+                    scrollView.contentOffset.x = 0.0
+                }
+            } else {
+                scrollView.contentOffset.x = 0.0
             }
+            
+            return
         }
         
         let contentWidth = scrollView.contentSize.width
@@ -235,6 +249,30 @@ extension SliderView: UIScrollViewDelegate {
             scrollView.contentOffset = CGPoint(x: offsetX - (contentWidth / 3), y: scrollView.contentOffset.y)
         } else {
             lastFrameContentOffsetX = scrollView.contentOffset.x
+        }
+    }
+    
+    func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
+        snapIntoPlace()
+    }
+    
+    func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
+        if (!decelerate) {
+            snapIntoPlace()
+        }
+    }
+    
+    private func snapIntoPlace() {
+        let cellWidth = cellWidth
+        let snappedValue = Int(floor(realOffsetX / cellWidth + 0.5))
+        let newRealOffsetX = CGFloat(snappedValue) * cellWidth
+        let offsetDelta = newRealOffsetX - realOffsetX
+        UIView.animate(withDuration: 0.2) { [weak self] in
+            self?.infiniteScrollView.contentOffset.x += offsetDelta
+        } completion: { [weak self] completed in
+            if (completed) {
+                self?.feedbackGenerator.impactOccurred(intensity: 1.0)
+            }
         }
     }
 }
@@ -271,7 +309,7 @@ extension SliderView {
         @Binding var value: Int
         
         func makeUIView(context: Context) -> SliderView {
-            let slider = SliderView(config: .init(defaultValue: 0, numberOfItems: 19, unit: "kg"))
+            let slider = SliderView(config: .init(defaultValue: value, numberOfItems: 19, unit: "kg"))
             slider.delegate = context.coordinator
             return slider
         }
@@ -280,6 +318,7 @@ extension SliderView {
         }
         
         func updateUIView(_ uiView: SliderView, context: Context) {
+            uiView.updateValue(value: value)
         }
         
         func makeCoordinator() -> Coordinator {
@@ -306,4 +345,10 @@ private class SliderCell: UICollectionViewCell {
         super.init(coder: coder)
     }
 
+}
+
+extension CGFloat {
+    func truncate(places : Int)-> CGFloat {
+        return CGFloat(floor(pow(10.0, CGFloat(places)) * self)/pow(10.0, CGFloat(places)))
+    }
 }
