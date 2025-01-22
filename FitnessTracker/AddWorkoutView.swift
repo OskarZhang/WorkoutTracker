@@ -36,6 +36,9 @@ struct AddWorkoutView: View {
     
     @Environment(\.colorScheme) var colorScheme
 
+    var isValidInput: Bool {
+        return !viewModel.workoutName.isEmpty
+    }
     
     var body: some View {
         NavigationView {
@@ -53,8 +56,11 @@ struct AddWorkoutView: View {
                         isNameFocused = true
                     }
                     .onSubmit {
-                        isWeightTextFieldFocused = true
+                        if isValidInput {
+                            saveWorkout()
+                        }
                     }
+                    .submitLabel(.done)
                 
                     .pickerStyle(SegmentedPickerStyle())
                 
@@ -80,7 +86,7 @@ struct AddWorkoutView: View {
                         .shadow(radius: 0.3)
                     } else {
                         ScrollView(.horizontal, showsIndicators: false) {
-                            HStack(alignment: .bottom, spacing: 16) {
+                            HStack(alignment: .bottom) {
                                 ForEach(suggestWorkoutNames(text: viewModel.workoutName)) { workout in
                                     Button {
                                         switch workout.type {
@@ -96,12 +102,12 @@ struct AddWorkoutView: View {
                                     } label: {
                                         Text(workout.name)
                                             .lineLimit(1)
+                                            .padding(EdgeInsets(top: 0.0, leading: 8.0, bottom: 0.0, trailing: 8.0))
                                     }
                                     .fixedSize(horizontal: true, vertical: /*@START_MENU_TOKEN@*/true/*@END_MENU_TOKEN@*/)
                                 }
                             }
                         }
-                        .padding(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
                     }
                 }
                 .padding(EdgeInsets(top: 0, leading: 0, bottom: 16, trailing: 0))
@@ -111,7 +117,7 @@ struct AddWorkoutView: View {
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button("Save") { saveWorkout() }
-                        .disabled(viewModel.weight < 0 || viewModel.workoutName.isEmpty)
+                        .disabled(!isValidInput)
                 }
             }
         }
