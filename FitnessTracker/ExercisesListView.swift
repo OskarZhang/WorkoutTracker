@@ -31,15 +31,21 @@ struct ExercisesListView: View {
     var body: some View {
         NavigationView {
             ZStack {
-                List {
-                    ForEach(groupedWorkouts, id: \.date) { group in
-                        Section(header: Text(ExercisesListView.formattedDate(group.date))) {
-                            ForEach(group.workouts) { workout in
-                                NavigationLink(destination: WorkoutDetailView(workout: workout)) {
-                                    WorkoutRow(workout: workout)
+                VStack {
+                    if workouts.isEmpty {
+                        Text("No workouts found in the last 7 days")
+                    } else {
+                        List {
+                            ForEach(groupedWorkouts, id: \.date) { group in
+                                Section(header: Text(ExercisesListView.formattedDate(group.date))) {
+                                    ForEach(group.workouts) { workout in
+                                        NavigationLink(destination: WorkoutDetailView(workout: workout)) {
+                                            WorkoutRow(workout: workout)
+                                        }
+                                    }
+                                    .onDelete(perform: deleteWorkouts)
                                 }
                             }
-                            .onDelete(perform: deleteWorkouts)
                         }
                     }
                 }
@@ -69,10 +75,6 @@ struct ExercisesListView: View {
                     } else {
                         EmptyView()
                     }
-                    
-                    Button("Experimental Add") {
-                        isPresentingExperimentalAdd = true
-                    }
                 }
                 .fileImporter(isPresented: $showingImportFileSelector, allowedContentTypes: [.item], allowsMultipleSelection: false) { result in
                     switch result {
@@ -84,6 +86,7 @@ struct ExercisesListView: View {
                         print(error)
                     }
                 }
+                
                 VStack {
                     Spacer()
                     HStack {
@@ -105,10 +108,6 @@ struct ExercisesListView: View {
         .sheet(isPresented: $isAddingWorkout) {
             AddWorkoutView(isPresented: $isAddingWorkout, modelContext: modelContext)
         }
-        .sheet(isPresented: $isPresentingExperimentalAdd) {
-            InputViewRepresentable().presentationDetents([.height(100)])
-        }
-
     }
     
     private func deleteWorkouts(offsets: IndexSet) {

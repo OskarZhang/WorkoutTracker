@@ -11,7 +11,7 @@ import SwiftUIIntrospect
 
 struct AddWorkoutViewModel {
     var workoutName = ""
-    var weight = ""
+    var weight = 0
     var repCount = 5
     var setCount = 5
     var workoutDate = Date()
@@ -36,6 +36,9 @@ struct AddWorkoutView: View {
     
     @Environment(\.colorScheme) var colorScheme
 
+    var isValidInput: Bool {
+        return !viewModel.workoutName.isEmpty
+    }
     
     var body: some View {
         NavigationView {
@@ -53,20 +56,15 @@ struct AddWorkoutView: View {
                         isNameFocused = true
                     }
                     .onSubmit {
-                        isWeightTextFieldFocused = true
+                        if isValidInput {
+                            saveWorkout()
+                        }
                     }
+                    .submitLabel(.done)
                 
                     .pickerStyle(SegmentedPickerStyle())
                 
-                InputViewRepresentable().frame(height: 100)
-//                TextField("Weight (lbs)", text: $viewModel.weight)
-//                    .keyboardType(.numberPad)
-//                    .focused($isWeightTextFieldFocused)
-//                    .onSubmit {
-//                        if (!viewModel.workoutName.isEmpty && !viewModel.weight.isEmpty) {
-//                            saveWorkout()
-//                        }
-//                    }
+                SliderView.Representable(value: $viewModel.weight).frame(height: 100)
                 Stepper("Reps: \(viewModel.repCount)", value: $viewModel.repCount, in: 1...100)
                 Stepper("Sets: \(viewModel.setCount)", value: $viewModel.setCount, in: 1...10)
                 DatePicker("Date", selection: $viewModel.workoutDate, displayedComponents: .date)
@@ -88,14 +86,14 @@ struct AddWorkoutView: View {
                         .shadow(radius: 0.3)
                     } else {
                         ScrollView(.horizontal, showsIndicators: false) {
-                            HStack(alignment: .bottom, spacing: 16) {
+                            HStack(alignment: .bottom) {
                                 ForEach(suggestWorkoutNames(text: viewModel.workoutName)) { workout in
                                     Button {
                                         switch workout.type {
                                         case .cardio(_):
                                             break
                                         case .strength(let weight, let repCount, let setCount):
-                                            self.viewModel.weight = "\(weight)"
+                                            self.viewModel.weight = weight
                                             self.viewModel.repCount = repCount
                                             self.viewModel.setCount = setCount
                                             self.viewModel.workoutName = workout.name
@@ -104,12 +102,12 @@ struct AddWorkoutView: View {
                                     } label: {
                                         Text(workout.name)
                                             .lineLimit(1)
+                                            .padding(EdgeInsets(top: 0.0, leading: 8.0, bottom: 0.0, trailing: 8.0))
                                     }
                                     .fixedSize(horizontal: true, vertical: /*@START_MENU_TOKEN@*/true/*@END_MENU_TOKEN@*/)
                                 }
                             }
                         }
-                        .padding(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
                     }
                 }
                 .padding(EdgeInsets(top: 0, leading: 0, bottom: 16, trailing: 0))
@@ -119,7 +117,7 @@ struct AddWorkoutView: View {
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button("Save") { saveWorkout() }
-                        .disabled(viewModel.weight.isEmpty || viewModel.workoutName.isEmpty)
+                        .disabled(!isValidInput)
                 }
             }
         }
@@ -146,7 +144,7 @@ struct AddWorkoutView: View {
     
     private func saveWorkout() {
         let workoutType: WorkoutType
-        let weightInt = Int(viewModel.weight) ?? 0
+        let weightInt = viewModel.weight
         let repCountInt = viewModel.repCount
         let setCountInt = viewModel.setCount
         workoutType = .strength(weight: weightInt, repCount: repCountInt, setCount: setCountInt)
@@ -157,9 +155,9 @@ struct AddWorkoutView: View {
     }
     
     private func addWeight(additionalWeight: Int) {
-        var curWeight = Int(viewModel.weight) ?? 0
+        var curWeight = viewModel.weight
         curWeight += additionalWeight
-        viewModel.weight = String(curWeight)
+        viewModel.weight = curWeight
     }
     
     private func suggestWorkoutNames(text: String) -> [Workout] {
