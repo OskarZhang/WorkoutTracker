@@ -17,7 +17,8 @@ struct ExercisesListView: View {
             (date: date, workouts: groupedDict[date]!)
         }
     }
-    
+    @Environment(\.colorScheme) var colorScheme
+
     @State private var isAddingWorkout = false
     @State private var isPresentingExperimentalAdd = false
     @State private var showingSettings = false
@@ -39,14 +40,17 @@ struct ExercisesListView: View {
                             ForEach(groupedWorkouts, id: \.date) { group in
                                 Section(header: Text(ExercisesListView.formattedDate(group.date))) {
                                     ForEach(group.workouts) { workout in
-                                        NavigationLink(destination: WorkoutDetailView(workout: workout)) {
-                                            WorkoutRow(workout: workout)
-                                        }
+                                        WorkoutRow(workout: workout).background(NavigationLink("", destination: WorkoutDetailView(workout: workout))
+                                            .opacity(0)
+                                        )
+                                        .listRowSeparator(.hidden)
                                     }
                                     .onDelete(perform: deleteWorkouts)
                                 }
+                                
                             }
                         }
+                        .listStyle(.plain)
                     }
                 }
                 .navigationTitle("Exercises")
@@ -95,8 +99,8 @@ struct ExercisesListView: View {
                             Image(systemName: "plus")
                                 .font(.title)
                                 .frame(width: 60, height: 60)
-                                .background(Color.blue)
-                                .foregroundColor(.white)
+                                .background(colorScheme == .dark ? Color.white : Color.black)
+                                .foregroundColor(colorScheme == .dark ? Color.black : Color.white)
                                 .clipShape(Circle())
                                 .shadow(radius: 4)
                         }
@@ -199,17 +203,19 @@ struct WorkoutRow: View {
     
     var body: some View {
         VStack(alignment: .leading) {
+                
             Text(workout.name)
-                .font(.headline)
+                .font(.system(size: 20, weight: .medium))
             
             switch workout.type {
             case .strength(let weight, let repCount, let setCount):
                 Text("\(weight) lbs, \(repCount) reps, \(setCount) sets")
-                    .font(.subheadline)
+                    .font(.callout)
             case .cardio(let durationMinutes):
                 Text("Cardio: \(durationMinutes) minutes")
-                    .font(.subheadline)
+                    .font(.callout)
             }
         }
+
     }
 }

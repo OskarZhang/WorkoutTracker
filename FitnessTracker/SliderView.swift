@@ -20,10 +20,6 @@ class SliderView: UIView {
         var unit: String
     }
     
-//    private var cellWidth: CGFloat {
-//        return collectionView.frame.width / CGFloat(config.numberOfItems)
-//    }
-    
     private var numOfBufferCells: Int {
         return 4
     }

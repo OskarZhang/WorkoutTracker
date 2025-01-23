@@ -21,7 +21,7 @@ struct WorkoutDetailView: View {
             VStack(alignment: .leading, spacing: 20) {
                 Text(workout.name)
                     .font(.largeTitle)
-                    .fontWeight(.bold)
+                    .fontWeight(.medium)
                 
                 if case .strength(let weight, let repCount, let setCount) = workout.type {
                     WorkoutDataView(label: "Weight", value: "\(weight) lbs")
@@ -32,15 +32,15 @@ struct WorkoutDetailView: View {
                 WorkoutDataView(label: "Date", value: workout.date.formatted(date: .long, time: .omitted))
                 
                 Text("Progress Chart")
-                    .font(.title2)
-                    .fontWeight(.bold)
+                    .font(.title3)
+                    .fontWeight(.medium)
                     .padding(.top)
                 
                 WorkoutChartView(workout.name)
                     .frame(height: 300)
                 .padding()
                 
-                Text("Pinch to zoom the chart")
+                Text("Pinch to zoom on the chart")
                     .font(.caption)
                     .foregroundColor(.secondary)
             }
@@ -57,11 +57,9 @@ struct WorkoutDataView: View {
     var body: some View {
         HStack {
             Text(label)
-                .font(.title3)
-                .fontWeight(.semibold)
             Spacer()
             Text(value)
-                .font(.title3)
+                .fontWeight(.semibold)
         }
     }
 }

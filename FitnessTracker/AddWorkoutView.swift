@@ -30,7 +30,6 @@ struct AddWorkoutView: View {
     @Query(sort: \Workout.date, order: .reverse) private var workouts: [Workout]
     @State private var viewModel: AddWorkoutViewModel = .init()
     @FocusState private var isNameFocused
-    @FocusState private var isWeightTextFieldFocused
     
     @State private var hasSetInitialFocus = false
     
@@ -43,9 +42,12 @@ struct AddWorkoutView: View {
     var body: some View {
         NavigationView {
             List {
-                TextField("Workout Name", text: $viewModel.workoutName)
+
+                TextField("Add workout", text: $viewModel.workoutName)
                     .autocorrectionDisabled(true)
+                    .font(.largeTitle)
                     .focused($isNameFocused)
+                    .listRowSeparator(.hidden)
                     .introspect(.textField, on: .iOS(.v13, .v14, .v15, .v16, .v17, .v18), customize: { textField in
                         if (!hasSetInitialFocus && isPresented) {
                             textField.becomeFirstResponder()
@@ -60,66 +62,53 @@ struct AddWorkoutView: View {
                             saveWorkout()
                         }
                     }
+                    
                     .submitLabel(.done)
-                
-                    .pickerStyle(SegmentedPickerStyle())
-                
-                SliderView.Representable(value: $viewModel.weight).frame(height: 100)
-                Stepper("Reps: \(viewModel.repCount)", value: $viewModel.repCount, in: 1...100)
-                Stepper("Sets: \(viewModel.setCount)", value: $viewModel.setCount, in: 1...10)
+                    .padding(.top, 16)
+
+                Stepper("Reps \(viewModel.repCount)", value: $viewModel.repCount, in: 1...100)
+                    .listRowSeparator(.hidden)
+                Stepper("Sets \(viewModel.setCount)", value: $viewModel.setCount, in: 1...10)
+                    .listRowSeparator(.hidden)
+
                 DatePicker("Date", selection: $viewModel.workoutDate, displayedComponents: .date)
+                    .listRowSeparator(.hidden)
+
+                Text("Weight")
+                SliderView.Representable(value: $viewModel.weight).frame(height: 120)
+                    .listRowInsets(EdgeInsets())
+                    .listRowSeparator(.hidden)
                 
             }
             
             .listStyle(.plain)
+            
             .keyboardToolbar {
-                Group {
-                    if (isWeightTextFieldFocused) {
-                        HStack(alignment: .bottom, spacing: 16) {
-                            Spacer()
-                            dumbbellButton(weight: 10)
-                            dumbbellButton(weight: 25)
-                            dumbbellButton(weight: 45)
-                            Spacer()
-                        }
-                        .frame(maxWidth: .infinity)
-                        .shadow(radius: 0.3)
-                    } else {
-                        ScrollView(.horizontal, showsIndicators: false) {
-                            HStack(alignment: .bottom) {
-                                ForEach(suggestWorkoutNames(text: viewModel.workoutName)) { workout in
-                                    Button {
-                                        switch workout.type {
-                                        case .cardio(_):
-                                            break
-                                        case .strength(let weight, let repCount, let setCount):
-                                            self.viewModel.weight = weight
-                                            self.viewModel.repCount = repCount
-                                            self.viewModel.setCount = setCount
-                                            self.viewModel.workoutName = workout.name
-                                            self.isWeightTextFieldFocused = true
-                                        }
-                                    } label: {
-                                        Text(workout.name)
-                                            .lineLimit(1)
-                                            .padding(EdgeInsets(top: 0.0, leading: 8.0, bottom: 0.0, trailing: 8.0))
+                    ScrollView(.horizontal, showsIndicators: false) {
+                        HStack(alignment: .bottom) {
+                            ForEach(suggestWorkoutNames(text: viewModel.workoutName)) { workout in
+                                Button(workout.name) {
+                                    switch workout.type {
+                                    case .cardio(_):
+                                        break
+                                    case .strength(let weight, let repCount, let setCount):
+                                        self.viewModel.weight = weight
+                                        self.viewModel.repCount = repCount
+                                        self.viewModel.setCount = setCount
+                                        self.viewModel.workoutName = workout.name
                                     }
-                                    .fixedSize(horizontal: true, vertical: /*@START_MENU_TOKEN@*/true/*@END_MENU_TOKEN@*/)
                                 }
+                                .buttonStyle(.bordered)
+                                .buttonBorderShape(.capsule)
+                                .tint(colorScheme == .dark ? Color.white : Color(UIColor.darkGray))
+                                .fixedSize(horizontal: true, vertical: /*@START_MENU_TOKEN@*/true/*@END_MENU_TOKEN@*/)
                             }
                         }
+                        .padding(EdgeInsets(top: 0.0, leading: 8.0, bottom: 8.0, trailing: 8.0))
                     }
-                }
-                .padding(EdgeInsets(top: 0, leading: 0, bottom: 16, trailing: 0))
+                    .background(Color(UIColor.systemBackground))
             }
-            .navigationTitle("Add Workout")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button("Save") { saveWorkout() }
-                        .disabled(!isValidInput)
-                }
-            }
+            .tint(colorScheme == .dark ? Color.white : Color(UIColor.black))
         }
     }
     

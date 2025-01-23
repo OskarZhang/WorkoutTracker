@@ -7,6 +7,8 @@
 import SwiftUI
 
 struct ContentView: View {
+    @Environment(\.colorScheme) var colorScheme
+
     var body: some View {
         TabView {
             ExercisesListView()
@@ -20,5 +22,6 @@ struct ContentView: View {
                     Text("Trends")
             }
         }
+        .tint(colorScheme == .dark ? Color.white : Color(UIColor.black))
     }
 }
