@@ -305,7 +305,7 @@ extension SliderView {
         @Binding var value: Int
         
         func makeUIView(context: Context) -> SliderView {
-            let slider = SliderView(config: .init(defaultValue: value, numberOfItems: 19, unit: "kg"))
+            let slider = SliderView(config: .init(defaultValue: value, numberOfItems: 19, unit: "lb"))
             slider.delegate = context.coordinator
             return slider
         }
