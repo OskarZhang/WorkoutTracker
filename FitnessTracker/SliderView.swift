@@ -150,12 +150,12 @@ class SliderView: UIView {
         addSubview(unitLabel)
         
         NSLayoutConstraint.activate([
-            infiniteScrollView.topAnchor.constraint(equalTo: unitLabel.bottomAnchor, constant: 10),
+            infiniteScrollView.topAnchor.constraint(equalTo: unitLabel.bottomAnchor, constant: 8.0),
             infiniteScrollView.bottomAnchor.constraint(equalTo: bottomAnchor),
             infiniteScrollView.leadingAnchor.constraint(equalTo: leadingAnchor),
             infiniteScrollView.trailingAnchor.constraint(equalTo: trailingAnchor),
             centerPin.centerXAnchor.constraint(equalTo: centerXAnchor),
-            centerPin.topAnchor.constraint(equalTo: unitLabel.bottomAnchor),
+            centerPin.topAnchor.constraint(equalTo: unitLabel.bottomAnchor, constant: 8.0),
             centerPin.bottomAnchor.constraint(equalTo: bottomAnchor),
             unitLabel.topAnchor.constraint(equalTo: topAnchor),
             currentValueLabel.centerXAnchor.constraint(equalTo: centerXAnchor),

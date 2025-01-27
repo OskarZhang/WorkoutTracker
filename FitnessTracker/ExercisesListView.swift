@@ -3,9 +3,10 @@ import SwiftData
 
 struct ExercisesListView: View {
     @Environment(\.modelContext) private var modelContext
-    @Query(filter: recentFilter() ,sort: \Workout.date, order: .reverse) private var workouts: [Workout]
+    @Query(sort: \Workout.date, order: .reverse) private var workouts: [Workout]
     
     var groupedWorkouts: [(date: Date, workouts: [Workout])] {
+        let startTime = Date().timeIntervalSince1970
         let groupedDict = Dictionary(grouping: workouts) { workout in
             // Normalize the date to remove time components
             Calendar.current.startOfDay(for: workout.date)
@@ -13,9 +14,12 @@ struct ExercisesListView: View {
         // Sort the dates in descending order
         let sortedDates = groupedDict.keys.sorted(by: >)
         // Map the sorted dates to an array of tuples
-        return sortedDates.map { date in
+        let res = sortedDates.map { date in
             (date: date, workouts: groupedDict[date]!)
         }
+        let endTime = Date().timeIntervalSince1970
+        debugPrint("grouping perf \(endTime - startTime)s")
+        return res
     }
     @Environment(\.colorScheme) var colorScheme
 

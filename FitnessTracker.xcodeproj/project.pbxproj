@@ -22,6 +22,7 @@
 		4BB21AA82C86D4BC00C1DEDE /* Data.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BB21AA72C86D4BC00C1DEDE /* Data.swift */; };
 		4BB21AAA2C86E11300C1DEDE /* KeyboardToolbar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BB21AA92C86E11300C1DEDE /* KeyboardToolbar.swift */; };
 		4BB21AAE2C8813E300C1DEDE /* WorkoutDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BB21AAD2C8813E300C1DEDE /* WorkoutDetailView.swift */; };
+		4BE34A932D434AB600D5D4BC /* WorkoutService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BE34A922D434AA400D5D4BC /* WorkoutService.swift */; };
 		4BF3492F2CCEFD0C00891FAE /* SliderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BF3492E2CCEFCFD00891FAE /* SliderView.swift */; };
 /* End PBXBuildFile section */
 
@@ -53,6 +54,7 @@
 		4BB21AA72C86D4BC00C1DEDE /* Data.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Data.swift; sourceTree = "<group>"; };
 		4BB21AA92C86E11300C1DEDE /* KeyboardToolbar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardToolbar.swift; sourceTree = "<group>"; };
 		4BB21AAD2C8813E300C1DEDE /* WorkoutDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutDetailView.swift; sourceTree = "<group>"; };
+		4BE34A922D434AA400D5D4BC /* WorkoutService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutService.swift; sourceTree = "<group>"; };
 		4BF3492E2CCEFCFD00891FAE /* SliderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SliderView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -89,6 +91,7 @@
 			isa = PBXGroup;
 			children = (
 				4B9F71D72CA4F81D009706C6 /* CSVExporter.swift */,
+				4BE34A922D434AA400D5D4BC /* WorkoutService.swift */,
 				4BA93FC02C86B7B300973198 /* FitnessTrackerApp.swift */,
 				4B31DA252CACC0A0005B3984 /* ContentView.swift */,
 				4B31DA272CACC176005B3984 /* TrendsView.swift */,
@@ -194,6 +197,7 @@
 				4B9F71DA2CA4F9E5009706C6 /* CSVImporter.swift in Sources */,
 				4BB21AAA2C86E11300C1DEDE /* KeyboardToolbar.swift in Sources */,
 				4BB21AA62C86D48300C1DEDE /* AddWorkoutView.swift in Sources */,
+				4BE34A932D434AB600D5D4BC /* WorkoutService.swift in Sources */,
 				4B31DA262CACC0A7005B3984 /* ContentView.swift in Sources */,
 				4B9F71D82CA4F81D009706C6 /* CSVExporter.swift in Sources */,
 				4BA93FC12C86B7B300973198 /* FitnessTrackerApp.swift in Sources */,
