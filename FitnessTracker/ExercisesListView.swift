@@ -5,6 +5,12 @@ struct ExercisesListView: View {
     @Environment(\.modelContext) private var modelContext
     @Query(sort: \Workout.date, order: .reverse) private var workouts: [Workout]
     
+    let workoutService: WorkoutService
+    
+    init(workoutService: WorkoutService) {
+        self.workoutService = workoutService
+    }
+    
     var groupedWorkouts: [(date: Date, workouts: [Workout])] {
         let startTime = Date().timeIntervalSince1970
         let groupedDict = Dictionary(grouping: workouts) { workout in
@@ -114,7 +120,7 @@ struct ExercisesListView: View {
             }
         }
         .sheet(isPresented: $isAddingWorkout) {
-            AddWorkoutView(isPresented: $isAddingWorkout, modelContext: modelContext)
+            AddWorkoutView(isPresented: $isAddingWorkout, workoutService: workoutService)
         }
     }
     

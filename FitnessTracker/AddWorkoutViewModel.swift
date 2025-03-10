@@ -18,13 +18,10 @@ class AddWorkoutViewModel {
     var setCount = 5
     var workoutDate = Date()
     
-    var workouts: [Workout] = []
+    private let workoutService: WorkoutService
     
-    let modelContext: ModelContext
-    
-    init(_ modelContext: ModelContext) {
-        self.modelContext = modelContext
-        self.workouts = fetchWorkouts()
+    init(service: WorkoutService) {
+        self.workoutService = service
     }
     
     var isValidInput: Bool {
@@ -34,33 +31,15 @@ class AddWorkoutViewModel {
     func save() {
         let workoutType = WorkoutType.strength(weight: weight, repCount: repCount, setCount: setCount)
         let newWorkout = Workout(name: workoutName.replacingOccurrences(of: "\\s+$", with: "", options: .regularExpression), type: workoutType, date: workoutDate)
-        modelContext.insert(newWorkout)
+        workoutService.addWorkout(workout: newWorkout)
     }
 
     func suggestWorkoutNames() -> [Workout] {
-        let finalList = (workoutName.isEmpty ? Array(workouts.prefix(10)) : workouts.filter { $0.name.lowercased().contains(workoutName.lowercased())})
-            .reduce((uniqueWorkoutNames: Set<String>(), list: [Workout]())) { partialResult, workout in
-                if (partialResult.uniqueWorkoutNames.contains(workout.name)) {
-                    return partialResult
-                }
-                var uniqueNames = partialResult.uniqueWorkoutNames
-                var list = partialResult.list
-                list.append(workout)
-                uniqueNames.insert(workout.name)
-                return (uniqueNames, list)
-            }
-            .list
-        if (finalList.count == 1 && workoutName == finalList.first?.name) {
-            // no need to provide suggestions for the exact match
-            return []
+        if workoutName.isEmpty {
+            return workoutService.predictNextWorkout()
+        } else {
+            return workoutService.matchWorkout(workoutName: workoutName)
         }
-        return finalList
-    }
-    
-    private func fetchWorkouts() -> [Workout] {
-        let descriptor = FetchDescriptor<Workout>(sortBy: [SortDescriptor(\.date, order: .reverse)])
-        return (try? modelContext.fetch(descriptor)) ?? []
     }
 
-    
 }

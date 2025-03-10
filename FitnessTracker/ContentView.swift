@@ -8,10 +8,11 @@ import SwiftUI
 
 struct ContentView: View {
     @Environment(\.colorScheme) var colorScheme
+    @Environment(\.modelContext) private var modelContext
 
     var body: some View {
         TabView {
-            ExercisesListView()
+            ExercisesListView(workoutService: WorkoutService(modelContext))
                 .tabItem {
                     Image(systemName: "dumbbell")
                     Text("Exercises")

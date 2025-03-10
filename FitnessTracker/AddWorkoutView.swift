@@ -9,14 +9,6 @@ import SwiftUI
 import SwiftData
 import SwiftUIIntrospect
 
-//struct AddWorkoutViewModel {
-//    var workoutName = ""
-//    var weight = 0
-//    var repCount = 5
-//    var setCount = 5
-//    var workoutDate = Date()
-//}
-
 struct AddWorkoutView: View {
     
     @State private var viewModel: AddWorkoutViewModel
@@ -26,9 +18,9 @@ struct AddWorkoutView: View {
     @Binding var isPresented: Bool
     @Environment(\.colorScheme) var colorScheme
     
-    init(isPresented: Binding<Bool>, modelContext: ModelContext) {
+    init(isPresented: Binding<Bool>, workoutService: WorkoutService) {
         self._isPresented = isPresented
-        self.viewModel = .init(modelContext)
+        self.viewModel = .init(service: workoutService)
     }
     
     var body: some View {
