@@ -10,19 +10,19 @@ import SwiftData
 import SwiftUIIntrospect
 
 struct AddWorkoutView: View {
-    
+
     @State private var viewModel: AddWorkoutViewModel
     @FocusState private var isNameFocused
     @State private var hasSetInitialFocus = false
 
     @Binding var isPresented: Bool
     @Environment(\.colorScheme) var colorScheme
-    
+
     init(isPresented: Binding<Bool>, workoutService: WorkoutService) {
         self._isPresented = isPresented
         self.viewModel = .init(service: workoutService)
     }
-    
+
     var body: some View {
         NavigationView {
             List {
@@ -33,7 +33,7 @@ struct AddWorkoutView: View {
                     .focused($isNameFocused)
                     .listRowSeparator(.hidden)
                     .introspect(.textField, on: .iOS(.v13, .v14, .v15, .v16, .v17, .v18), customize: { textField in
-                        if (!hasSetInitialFocus && isPresented) {
+                        if !hasSetInitialFocus && isPresented {
                             textField.becomeFirstResponder()
                             hasSetInitialFocus = true
                         }
@@ -46,7 +46,7 @@ struct AddWorkoutView: View {
                             saveWorkout()
                         }
                     }
-                    
+
                     .submitLabel(.done)
                     .padding(.top, 16)
 
@@ -62,7 +62,7 @@ struct AddWorkoutView: View {
                 SliderView.Representable(value: $viewModel.weight).frame(height: 120)
                     .listRowInsets(EdgeInsets())
                     .listRowSeparator(.hidden)
-                
+
             }
             .listStyle(.plain)
             .keyboardToolbar {
@@ -71,12 +71,12 @@ struct AddWorkoutView: View {
                             ForEach(viewModel.suggestWorkoutNames()) { workout in
                                 Button(workout.name) {
                                     switch workout.type {
-                                    case .cardio(_):
+                                    case .cardio:
                                         break
-                                    case .strength(let weight, let repCount, let setCount):
-                                        self.viewModel.weight = weight
-                                        self.viewModel.repCount = repCount
-                                        self.viewModel.setCount = setCount
+                                    case .strength:
+                                        self.viewModel.weight = Int(workout.maxWeight)
+                                        self.viewModel.repCount = workout.maxRep
+                                        self.viewModel.setCount = workout.sets?.count ?? 0
                                         self.viewModel.workoutName = workout.name
                                     }
                                 }

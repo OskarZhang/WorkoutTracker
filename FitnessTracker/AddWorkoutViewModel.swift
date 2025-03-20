@@ -17,29 +17,25 @@ class AddWorkoutViewModel {
     var repCount = 5
     var setCount = 5
     var workoutDate = Date()
-    
+
     private let workoutService: WorkoutService
-    
+
     init(service: WorkoutService) {
         self.workoutService = service
     }
-    
+
     var isValidInput: Bool {
         return !workoutName.isEmpty
     }
 
     func save() {
-        let workoutType = WorkoutType.strength(weight: weight, repCount: repCount, setCount: setCount)
-        let newWorkout = Workout(name: workoutName.replacingOccurrences(of: "\\s+$", with: "", options: .regularExpression), type: workoutType, date: workoutDate)
+        let sets = (0..<setCount).map { _ in StrengthSet(weightInLbs: Double(weight), reps: repCount, restSeconds: nil) }
+        let newWorkout = Exercise(date: workoutDate, name: workoutName.replacingOccurrences(of: "\\s+$", with: "", options: .regularExpression), type: .strength, sets: sets)
         workoutService.addWorkout(workout: newWorkout)
     }
 
-    func suggestWorkoutNames() -> [Workout] {
-        if workoutName.isEmpty {
-            return workoutService.predictNextWorkout()
-        } else {
-            return workoutService.matchWorkout(workoutName: workoutName)
-        }
+    func suggestWorkoutNames() -> [ExcerciseDataType] {
+        workoutService.getWorkoutSuggestion(workoutName: workoutName)
     }
 
 }

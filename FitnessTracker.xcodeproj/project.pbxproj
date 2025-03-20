@@ -13,6 +13,7 @@
 		4B31DA282CACC17A005B3984 /* TrendsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B31DA272CACC176005B3984 /* TrendsView.swift */; };
 		4B31DA2A2CACC2FA005B3984 /* WorkoutChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B31DA292CACC2F5005B3984 /* WorkoutChartView.swift */; };
 		4B78EC452D4825EF005BD630 /* AddWorkoutViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B78EC442D4825EA005BD630 /* AddWorkoutViewModel.swift */; };
+		4B99D9D42E28B60200073F3F /* strength_workout_names.csv in Resources */ = {isa = PBXBuildFile; fileRef = 4B99D9D32E28B60200073F3F /* strength_workout_names.csv */; };
 		4B9F71D82CA4F81D009706C6 /* CSVExporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9F71D72CA4F81D009706C6 /* CSVExporter.swift */; };
 		4B9F71DA2CA4F9E5009706C6 /* CSVImporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9F71D92CA4F9E5009706C6 /* CSVImporter.swift */; };
 		4BA93FC12C86B7B300973198 /* FitnessTrackerApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BA93FC02C86B7B300973198 /* FitnessTrackerApp.swift */; };
@@ -45,6 +46,8 @@
 		4B31DA272CACC176005B3984 /* TrendsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrendsView.swift; sourceTree = "<group>"; };
 		4B31DA292CACC2F5005B3984 /* WorkoutChartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutChartView.swift; sourceTree = "<group>"; };
 		4B78EC442D4825EA005BD630 /* AddWorkoutViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddWorkoutViewModel.swift; sourceTree = "<group>"; };
+		4B85B4812D8BDB1D000E6206 /* FitnessTracker.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = FitnessTracker.entitlements; sourceTree = "<group>"; };
+		4B99D9D32E28B60200073F3F /* strength_workout_names.csv */ = {isa = PBXFileReference; lastKnownFileType = text; path = strength_workout_names.csv; sourceTree = "<group>"; };
 		4B9F71D72CA4F81D009706C6 /* CSVExporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CSVExporter.swift; sourceTree = "<group>"; };
 		4B9F71D92CA4F9E5009706C6 /* CSVImporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CSVImporter.swift; sourceTree = "<group>"; };
 		4BA93FBD2C86B7B300973198 /* FitnessTracker.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FitnessTracker.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -76,6 +79,7 @@
 		4BA93FB42C86B7B300973198 = {
 			isa = PBXGroup;
 			children = (
+				4B99D9D32E28B60200073F3F /* strength_workout_names.csv */,
 				4BA93FBF2C86B7B300973198 /* FitnessTracker */,
 				4BA93FBE2C86B7B300973198 /* Products */,
 			);
@@ -92,6 +96,7 @@
 		4BA93FBF2C86B7B300973198 /* FitnessTracker */ = {
 			isa = PBXGroup;
 			children = (
+				4B85B4812D8BDB1D000E6206 /* FitnessTracker.entitlements */,
 				4BD095A62D7E588100F4769F /* Recommender.swift */,
 				4B9F71D72CA4F81D009706C6 /* CSVExporter.swift */,
 				4BA93FC02C86B7B300973198 /* FitnessTrackerApp.swift */,
@@ -182,6 +187,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4B99D9D42E28B60200073F3F /* strength_workout_names.csv in Resources */,
 				4BA93FC82C86B7B400973198 /* Preview Assets.xcassets in Resources */,
 				4BA93FC52C86B7B400973198 /* Assets.xcassets in Resources */,
 			);
@@ -338,12 +344,15 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = FitnessTracker/FitnessTracker.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"FitnessTracker/Preview Content\"";
 				DEVELOPMENT_TEAM = RYRSSY3589;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSHealthShareUsageDescription = "Push your workout logs to your Health app";
+				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "Push your workout logs to your Health app";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -367,12 +376,15 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = FitnessTracker/FitnessTracker.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"FitnessTracker/Preview Content\"";
 				DEVELOPMENT_TEAM = RYRSSY3589;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSHealthShareUsageDescription = "Push your workout logs to your Health app";
+				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "Push your workout logs to your Health app";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;

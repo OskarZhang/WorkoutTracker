@@ -1,19 +1,35 @@
 import SwiftUI
 import SwiftData
+import HealthKitUI
+import Combine
+
+class SearchContext: ObservableObject {
+
+    @Published var searchText: String = ""
+    @Published var debouncedSearchText: String = ""
+
+    init() {
+        $searchText
+            .debounce(for: .seconds(0.3), scheduler: RunLoop.main)
+            .assign(to: &$debouncedSearchText)
+    }
+}
 
 struct ExercisesListView: View {
     @Environment(\.modelContext) private var modelContext
-    @Query(sort: \Workout.date, order: .reverse) private var workouts: [Workout]
-    
+    @Query(sort: \ExcerciseDataType.date, order: .reverse) private var workouts: [ExcerciseDataType]
+
     let workoutService: WorkoutService
-    
+
     init(workoutService: WorkoutService) {
         self.workoutService = workoutService
     }
-    
-    var groupedWorkouts: [(date: Date, workouts: [Workout])] {
+
+    var groupedWorkouts: [(date: Date, workouts: [ExcerciseDataType])] {
         let startTime = Date().timeIntervalSince1970
-        let groupedDict = Dictionary(grouping: workouts) { workout in
+        let groupedDict = Dictionary(grouping: workouts.filter({ workout in
+            searchContext.debouncedSearchText.isEmpty || workout.name.lowercased().contains(searchContext.debouncedSearchText.lowercased())
+        })) { workout in
             // Normalize the date to remove time components
             Calendar.current.startOfDay(for: workout.date)
         }
@@ -39,6 +55,12 @@ struct ExercisesListView: View {
     @State private var showErrorAlert: Bool = false
     @State private var errorMessage: String = ""
 
+    // health data
+    @State var authenticated = false
+    @State var trigger = false
+
+    @StateObject var searchContext = SearchContext()
+
     var body: some View {
         NavigationView {
             ZStack {
@@ -57,7 +79,7 @@ struct ExercisesListView: View {
                                     }
                                     .onDelete(perform: deleteWorkouts)
                                 }
-                                
+
                             }
                         }
                         .listStyle(.plain)
@@ -67,16 +89,17 @@ struct ExercisesListView: View {
                 .toolbar {
                     Button("", systemImage: "gear") {
                         showingSettings = true
-                        exportAndPrepareShare()
+                        // todo: re-enable export
+//                        exportAndPrepareShare()
                     }
-                    
+
                 }
                 .confirmationDialog("", isPresented: $showingSettings) {
                     Button("Import") {
                         showingImportFileSelector.toggle()
                         print("tapped")
                     }
-                    
+
                     if let csvURL = exportedCSVFileURL {
                         ShareLink(item: csvURL) {
                             Label("Export", systemImage: "square.and.arrow.up")
@@ -89,6 +112,40 @@ struct ExercisesListView: View {
                     } else {
                         EmptyView()
                     }
+
+//                    Button("Access health data") {
+//                        // OK to read or write HealthKit data here.
+//                    }
+//                    .disabled(!authenticated)
+//                    
+//                    // If HealthKit data is available, request authorization
+//                    // when this view appears.
+//                    .onAppear() {
+//                        
+//                        // Check that Health data is available on the device.
+//                        if HKHealthStore.isHealthDataAvailable() {
+//                            // Modifying the trigger initiates the health data
+//                            // access request.
+//                            trigger.toggle()
+//                        }
+//                    }
+//                    
+//                    // Requests access to share and read HealthKit data types
+//                    // when the trigger changes.
+//                    .healthDataAccessRequest(store: healthStore,
+//                                             shareTypes: [.workoutType()],
+//                                             readTypes: [.activitySummaryType()],
+//                                             trigger: trigger) { result in
+//                        switch result {
+//                            
+//                        case .success(_):
+//                            authenticated = true
+//                        case .failure(let error):
+//                            // Handle the error here.
+//                            fatalError("*** An error occurred while requesting authentication: \(error) ***")
+//                        }
+//                    }
+
                 }
                 .fileImporter(isPresented: $showingImportFileSelector, allowedContentTypes: [.item], allowsMultipleSelection: false) { result in
                     switch result {
@@ -100,7 +157,7 @@ struct ExercisesListView: View {
                         print(error)
                     }
                 }
-                
+
                 VStack {
                     Spacer()
                     HStack {
@@ -119,11 +176,15 @@ struct ExercisesListView: View {
                 }
             }
         }
+        .onAppear {
+          print(modelContext.sqliteCommand)
+        }
+        .searchable(text: $searchContext.searchText)
         .sheet(isPresented: $isAddingWorkout) {
             AddWorkoutView(isPresented: $isAddingWorkout, workoutService: workoutService)
         }
     }
-    
+
     private func deleteWorkouts(offsets: IndexSet) {
         withAnimation {
             for index in offsets {
@@ -132,7 +193,7 @@ struct ExercisesListView: View {
             }
         }
     }
-    
+
     private func importFrom(fileURL: URL) {
         let importer = CSVImporter()
         _ = fileURL.startAccessingSecurityScopedResource()
@@ -142,20 +203,16 @@ struct ExercisesListView: View {
 
             // Parse the CSV
             let workouts = try importer.importCSV(csvString: csvInput)
-            
+
             // Use the parsed workouts
             for workout in workouts {
                 print("Workout ID: \(workout.id)")
                 print("Name: \(workout.name)")
-                switch workout.type {
-                case .strength(let weight, let reps, let sets):
+              switch workout.type {
+                case .strength:
                     print("Type: Strength")
-                    print("Weight: \(weight) lbs")
-                    print("Reps: \(reps)")
-                    print("Sets: \(sets)")
-                case .cardio(let duration):
+                case .cardio:
                     print("Type: Cardio")
-                    print("Duration: \(duration) minutes")
                 }
                 modelContext.insert(workout)
             }
@@ -163,35 +220,35 @@ struct ExercisesListView: View {
             print("Failed to import CSV: \(error.localizedDescription)")
         }
     }
-    
+
     /// Function to export workouts to CSV and prepare the shareable file
     private func exportAndPrepareShare() {
         let exporter = CSVExporter()
         let csvString = exporter.export(workouts: workouts)
-        
+
         // Define the temporary file URL
         let tempDirectory = FileManager.default.temporaryDirectory
         let fileName = "workouts_\(Date().timeIntervalSince1970).csv"
         let fileURL = tempDirectory.appendingPathComponent(fileName)
-        
+
         do {
             // Write the CSV string to the temporary file
             try csvString.write(to: fileURL, atomically: true, encoding: .utf8)
             // Update the state to trigger ShareSheet
             exportedCSVFileURL = fileURL
-            
+
         } catch {
             print("Failed to write CSV file: \(error.localizedDescription)")
             errorMessage = "Failed to export workouts. Please try again."
             showErrorAlert = true
         }
     }
-    
-    private static func recentFilter() -> Predicate<Workout> {
+
+    private static func recentFilter() -> Predicate<ExcerciseDataType> {
         let recentCutOffDate = Date().addingTimeInterval(-7 * 24 * 60 * 60)
-        return #Predicate<Workout> { $0.date >= recentCutOffDate}
+        return #Predicate<ExcerciseDataType> { $0.date >= recentCutOffDate}
     }
-    
+
     private static func formattedDate(_ date: Date) -> String {
         let calendar = Calendar.current
         if calendar.isDateInToday(date) {
@@ -206,23 +263,22 @@ struct ExercisesListView: View {
     }
 }
 
-
-
 struct WorkoutRow: View {
-    let workout: Workout
-    
+    let workout: ExcerciseDataType
+
     var body: some View {
         VStack(alignment: .leading) {
-                
+
             Text(workout.name)
                 .font(.system(size: 20, weight: .medium))
-            
+
             switch workout.type {
-            case .strength(let weight, let repCount, let setCount):
-                Text("\(weight) lbs, \(repCount) reps, \(setCount) sets")
+            case .strength:
+
+                Text("\(Int(workout.maxWeight)) lbs, \(workout.maxRep) reps, \(workout.sets?.count ?? 0) sets")
                     .font(.callout)
-            case .cardio(let durationMinutes):
-                Text("Cardio: \(durationMinutes) minutes")
+            case .cardio:
+                Text("Cardio: \((workout.durationInSeconds ?? 0) / 60) minutes")
                     .font(.callout)
             }
         }

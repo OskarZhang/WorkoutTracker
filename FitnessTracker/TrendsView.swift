@@ -9,8 +9,8 @@ import SwiftUI
 import SwiftData
 
 struct TrendsView: View {
-    @Query var workouts: [Workout]
-    
+    @Query var workouts: [ExcerciseDataType]
+
     var workoutNameStats: [(name: String, count: Int, recentDate: Date)] {
         let groupedWorkouts = Dictionary(grouping: workouts, by: { $0.name })
         let stats = groupedWorkouts.map { (name, workouts) -> (name: String, count: Int, recentDate: Date) in
@@ -20,13 +20,13 @@ struct TrendsView: View {
         }
         return stats.sorted(by: { $0.recentDate > $1.recentDate })
     }
-    
+
     func formattedDate(_ date: Date) -> String {
         let formatter = DateFormatter()
         formatter.dateStyle = .medium
         return formatter.string(from: date)
     }
-    
+
     var body: some View {
         NavigationView {
             List(workoutNameStats, id: \.name) { item in
@@ -43,7 +43,7 @@ struct TrendsView: View {
                 .listRowSeparator(.hidden)
             }
             .listStyle(.plain)
-            
+
             .navigationTitle("Trends")
         }
     }
