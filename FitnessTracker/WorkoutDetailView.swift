@@ -22,16 +22,16 @@ struct WorkoutDetailView: View {
                 Text(exercise.name)
                     .font(.largeTitle)
                     .fontWeight(.medium)
-
+                Text(exercise.date.formatted(date: .long, time: .omitted))
+                    .foregroundStyle(.gray)
+                    .fontWeight(.semibold)
                 if case .strength = exercise.type,
                    let sets = exercise.sets {
                     ForEach(sets.indices, id: \.self) { setIndex in
-                        WorkoutDataView(label: "Weight", value: "\(sets[setIndex].weightInLbs) lbs")
-                        WorkoutDataView(label: "Reps", value: "\(sets[setIndex].reps)")
+                        StrengthSetView(weight: Int(sets[setIndex].weightInLbs), repCount: sets[setIndex].reps, setNumber: setIndex + 1)
                     }
                 }
 
-                WorkoutDataView(label: "Date", value: exercise.date.formatted(date: .long, time: .omitted))
 
                 Text("Progress Chart")
                     .font(.title3)
@@ -52,15 +52,20 @@ struct WorkoutDetailView: View {
     }
 }
 
-struct WorkoutDataView: View {
-    let label: String
-    let value: String
+struct StrengthSetView: View {
+    let weight: Int
+    let repCount: Int
+    let setNumber: Int
 
     var body: some View {
         HStack {
-            Text(label)
+            Text("Set \(setNumber)")
+                .foregroundStyle(.gray)
             Spacer()
-            Text(value)
+            Text("\(weight) lb")
+                .fontWeight(.semibold)
+            Spacer()
+            Text("\(repCount) reps")
                 .fontWeight(.semibold)
         }
     }
