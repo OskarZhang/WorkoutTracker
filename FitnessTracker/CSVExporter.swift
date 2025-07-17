@@ -30,20 +30,20 @@ struct CSVExporter {
     }
 
     /// Converts an array of Workout instances to a CSV string
-    func export(workouts: [ExcerciseDataType]) -> String {
+    func export(exercises: [Exercise]) -> String {
         // todo: make export work again
 //        var csvString = header
 //
-//        for workout in workouts {
-//            let id = workout.id.uuidString
-//            let name = escapeCSVField(workout.name)
+//        for exercise in exercises {
+//            let id = exercise.id.uuidString
+//            let name = escapeCSVField(exercise.name)
 //            var type = ""
 //            var weight = ""
 //            var repCount = ""
 //            var setCount = ""
 //            var durationMinutes = ""
 //
-//            switch workout.v1Type {
+//            switch exercise.v1Type {
 //            case .strength(let weightNum, let reps, let sets):
 //                type = "strength"
 //                weight = "\(weightNum)"
@@ -54,7 +54,7 @@ struct CSVExporter {
 //                durationMinutes = "\(duration)"
 //            }
 //
-//            let date = dateFormatter.string(from: workout.date)
+//            let date = dateFormatter.string(from: exercise.date)
 //
 //            // Construct the CSV row
 //            let row = "\(id),\(name),\(type),\(weight),\(repCount),\(setCount),\(durationMinutes),\(date)\n"

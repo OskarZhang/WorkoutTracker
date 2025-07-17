@@ -9,13 +9,13 @@ import SwiftUI
 import SwiftData
 
 struct TrendsView: View {
-    @Query var workouts: [ExcerciseDataType]
+    @Query var exercises: [Exercise]
 
-    var workoutNameStats: [(name: String, count: Int, recentDate: Date)] {
-        let groupedWorkouts = Dictionary(grouping: workouts, by: { $0.name })
-        let stats = groupedWorkouts.map { (name, workouts) -> (name: String, count: Int, recentDate: Date) in
-            let count = workouts.count
-            let recentDate = workouts.max(by: { $0.date < $1.date })?.date ?? Date.distantPast
+    var exerciseNameStats: [(name: String, count: Int, recentDate: Date)] {
+        let groupedWorkouts = Dictionary(grouping: exercises, by: { $0.name })
+        let stats = groupedWorkouts.map { (name, exercises) -> (name: String, count: Int, recentDate: Date) in
+            let count = exercises.count
+            let recentDate = exercises.max(by: { $0.date < $1.date })?.date ?? Date.distantPast
             return (name: name, count: count, recentDate: recentDate)
         }
         return stats.sorted(by: { $0.recentDate > $1.recentDate })
@@ -29,7 +29,7 @@ struct TrendsView: View {
 
     var body: some View {
         NavigationView {
-            List(workoutNameStats, id: \.name) { item in
+            List(exerciseNameStats, id: \.name) { item in
                 VStack(alignment: .leading, spacing: 8) {
                     Text(item.name)
                         .font(.largeTitle)

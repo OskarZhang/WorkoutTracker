@@ -8,7 +8,7 @@
 import SwiftData
 import Foundation
 
-class WorkoutService {
+class ExerciseService {
 
     static private let StartOfDayWorkoutToken: String = "StartOfDay"
 
@@ -16,10 +16,10 @@ class WorkoutService {
 
     private var transitions: [String: [String: Int]] = [:]
     private var transitionProbabilities: [String: [String: Double]] = [:]
-    private var workouts: [ExcerciseDataType] = []
+    private var exercises: [Exercise] = []
     
 
-    lazy var workoutNamesFromCSV: [String] = {
+    lazy var exerciseNamesFromCSV: [String] = {
         guard let url = Bundle.main.url(forResource: "strength_workout_names", withExtension: "csv") else {
             print("CSV file not found")
             return []
@@ -40,14 +40,14 @@ class WorkoutService {
 
     init(_ modelContext: ModelContext) {
         self.modelContext = modelContext
-        self.workouts = fetchWorkouts()
+        self.exercises = fetchWorkouts()
         Task {
-            await buildTransitionProbabilityMatrix(data: self.workouts)
+            await buildTransitionProbabilityMatrix(data: self.exercises)
         }
     }
 
-    /// build a Markov Chain prediction matrix with workout data
-    private func buildTransitionProbabilityMatrix(data: [ExcerciseDataType]) async {
+    /// build a Markov Chain prediction matrix with exercise data
+    private func buildTransitionProbabilityMatrix(data: [Exercise]) async {
         // Group exercises by date
         let calendar = Calendar.current
         let groupedByDate = Dictionary(grouping: data) { entry in
@@ -83,73 +83,73 @@ class WorkoutService {
         }
     }
 
-    func getWorkoutSuggestion(workoutName: String) -> [ExcerciseDataType] {
-        if workoutName.isEmpty && workouts.isEmpty {
-            // completely new user we just return the stock workout names
-            return workoutNamesFromCSV.map {
-                ExcerciseDataType(name: $0, type: .strength)
+    func getWorkoutSuggestion(exerciseName: String) -> [Exercise] {
+        if exerciseName.isEmpty && exercises.isEmpty {
+            // completely new user we just return the stock exercise names
+            return exerciseNamesFromCSV.map {
+                Exercise(name: $0, type: .strength)
             }
-        } else if workoutName.isEmpty {
+        } else if exerciseName.isEmpty {
             return predictNextWorkout()
         } else {
-            return matchWorkout(workoutName: workoutName)
+            return matchWorkout(exerciseName: exerciseName)
         }
     }
 
-    private func predictNextWorkout() -> [ExcerciseDataType] {
-        var lastWorkoutName: String = WorkoutService.StartOfDayWorkoutToken
-        if let mostRecentWorkout = workouts.first,
+    private func predictNextWorkout() -> [Exercise] {
+        var lastWorkoutName: String = ExerciseService.StartOfDayWorkoutToken
+        if let mostRecentWorkout = exercises.first,
            Calendar.current.isDateInToday(mostRecentWorkout.date) {
             lastWorkoutName = mostRecentWorkout.name
         }
         guard let nextExercises = transitionProbabilities[lastWorkoutName] else {
-            return Array(workouts.prefix(10))
+            return Array(exercises.prefix(10))
         }
 
         // Sort exercises by probability
-        let res = nextExercises.sorted { $0.value > $1.value }.map { $0.key }.compactMap { getMostRecentWorkout(workoutName: $0)}
+        let res = nextExercises.sorted { $0.value > $1.value }.map { $0.key }.compactMap { getMostRecentWorkout(exerciseName: $0)}
 
         return res
     }
 
-    func addWorkout(workout: Exercise) {
-        modelContext.insert(workout)
-        workouts.insert(workout, at: 0)
+    func addWorkout(exercise: Exercise) {
+        modelContext.insert(exercise)
+        exercises.insert(exercise, at: 0)
     }
 
-    private func matchWorkout(workoutName: String) -> [ExcerciseDataType] {
-        let existingWorkoutMatch = workouts.filter { $0.name.lowercased().contains(workoutName.lowercased())}
-            .reduce((uniqueWorkoutNames: Set<String>(), list: [ExcerciseDataType]())) { partialResult, workout in
-                if partialResult.uniqueWorkoutNames.contains(workout.name) {
+    private func matchWorkout(exerciseName: String) -> [Exercise] {
+        let existingWorkoutMatch = exercises.filter { $0.name.lowercased().contains(exerciseName.lowercased())}
+            .reduce((uniqueWorkoutNames: Set<String>(), list: [Exercise]())) { partialResult, exercise in
+                if partialResult.uniqueWorkoutNames.contains(exercise.name) {
                     return partialResult
                 }
                 var uniqueNames = partialResult.uniqueWorkoutNames
                 var list = partialResult.list
-                list.append(workout)
-                uniqueNames.insert(workout.name)
+                list.append(exercise)
+                uniqueNames.insert(exercise.name)
                 return (uniqueNames, list)
             }
             .list
-        if existingWorkoutMatch.count == 1 && workoutName == existingWorkoutMatch.first?.name {
+        if existingWorkoutMatch.count == 1 && exerciseName == existingWorkoutMatch.first?.name {
             // no need to provide suggestions for the exact match
             return []
         }
 
-        let stockWorkoutMatch = workoutNamesFromCSV.filter { $0.lowercased().contains(workoutName.lowercased()) }.map {
-            ExcerciseDataType(name: $0, type: .strength)
+        let stockWorkoutMatch = exerciseNamesFromCSV.filter { $0.lowercased().contains(exerciseName.lowercased()) }.map {
+            Exercise(name: $0, type: .strength)
         }
 
         return existingWorkoutMatch + stockWorkoutMatch
     }
 
-    private func getMostRecentWorkout(workoutName: String) -> ExcerciseDataType? {
-        var descriptor = FetchDescriptor<ExcerciseDataType>(predicate: #Predicate { $0.name == workoutName }, sortBy: [SortDescriptor(\.date, order: .reverse)])
+    private func getMostRecentWorkout(exerciseName: String) -> Exercise? {
+        var descriptor = FetchDescriptor<Exercise>(predicate: #Predicate { $0.name == exerciseName }, sortBy: [SortDescriptor(\.date, order: .reverse)])
         descriptor.fetchLimit = 1
         return (try? modelContext.fetch(descriptor))?.first
     }
 
-    private func fetchWorkouts() -> [ExcerciseDataType] {
-        let descriptor = FetchDescriptor<ExcerciseDataType>(sortBy: [SortDescriptor(\.date, order: .reverse)])
+    private func fetchWorkouts() -> [Exercise] {
+        let descriptor = FetchDescriptor<Exercise>(sortBy: [SortDescriptor(\.date, order: .reverse)])
         return (try? modelContext.fetch(descriptor)) ?? []
     }
 

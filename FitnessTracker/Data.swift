@@ -8,15 +8,6 @@
 import SwiftData
 import SwiftUI
 
-//enum WorkoutType: Codable, Equatable {
-//    case strength(weight: Int, repCount: Int, setCount: Int)
-//    case cardio(durationMinutes: Int)
-//}
-//
-
-typealias ExcerciseDataType = Exercise
-
-
 enum ExerciseType: String, Codable {
     case strength
     case cardio
@@ -74,45 +65,6 @@ class StrengthSet {
     }
 }
 
-
-//enum WorkoutMigrationPlan: SchemaMigrationPlan {
-//
-//  static var stages: [MigrationStage] {
-//      [migrateV1toV2]
-//  }
-//
-//  static var schemas: [any VersionedSchema.Type] {
-//    [WorkoutSchemaV1.self, WorkoutSchemaV2.self]
-//  }
-//
-//  // for some reason this migration never gets anything written to the new schema. fucku apple
-//    static let migrateV1toV2 = MigrationStage.custom(
-//        fromVersion: WorkoutSchemaV1.self,
-//        toVersion: WorkoutSchemaV2.self,
-//        willMigrate: { context in
-//            let oldWorkouts = try context.fetch(FetchDescriptor<WorkoutSchemaV1.Workout>())
-//            let newExcercises: [WorkoutSchemaV2.Exercise] = oldWorkouts.compactMap { workout in
-//                if case .strength(let weight, let repCount, let setCount) = workout.type {
-//                    let sets = (0..<setCount).map { _ in WorkoutSchemaV2.StrengthSet(weightInLbs: Double(weight), reps: repCount, restSeconds: nil) }
-//            let excercise = WorkoutSchemaV2.Exercise(date: workout.date, name: workout.name, type: .strength, sets: sets)
-//            return excercise
-//          }
-//          return nil
-//        }
-//        print(newExcercises)
-//        newExcercises.forEach { exercise in
-//          context.insert(exercise)
-//          print("saving!")
-//        }
-//
-//        try context.save()
-//
-//      }, didMigrate: nil
-//  )
-//
-//}
-
-
 extension Exercise {
     var maxWeight: Double {
         sets?.map { $0.weightInLbs }.max() ?? 0.0
@@ -122,12 +74,3 @@ extension Exercise {
     }
 }
 
-extension ModelContext {
-    var sqliteCommand: String {
-        if let url = container.configurations.first?.url.path(percentEncoded: false) {
-            "sqlite3 \"\(url)\""
-        } else {
-            "No SQLite database found."
-        }
-    }
-}

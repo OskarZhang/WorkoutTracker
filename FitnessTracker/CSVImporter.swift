@@ -39,14 +39,14 @@ struct CSVImporter {
     /// - Parameter csvString: The CSV data as a string
     /// - Throws: CSVImportError if parsing fails
     /// - Returns: Array of Workout instances
-    func importCSV(csvString: String) throws -> [ExcerciseDataType] {
-        var workouts: [ExcerciseDataType] = []
+    func importCSV(csvString: String) throws -> [Exercise] {
+        var exercises: [Exercise] = []
 
         // Split the CSV into lines
         let lines = csvString.components(separatedBy: .newlines).filter { !$0.trimmingCharacters(in: .whitespaces).isEmpty }
 
         guard !lines.isEmpty else {
-            return workouts // Empty CSV
+            return exercises // Empty CSV
         }
 
         // Parse header
@@ -107,14 +107,14 @@ struct CSVImporter {
                 }
 
             default:
-                throw CSVImportError.invalidRow(index: rowNumber, reason: "Unknown workout type: \(typeString)")
+                throw CSVImportError.invalidRow(index: rowNumber, reason: "Unknown exercise type: \(typeString)")
             }
 
             // Create Workout instance
-            workouts.append(Exercise(date: date, name: name, type: type, sets: sets, durationInSeconds: durationSeconds))
+            exercises.append(Exercise(date: date, name: name, type: type, sets: sets, durationInSeconds: durationSeconds))
         }
 
-        return workouts
+        return exercises
     }
 
     /// Parses a single CSV line into an array of fields, handling escaped characters

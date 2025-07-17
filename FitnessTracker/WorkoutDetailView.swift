@@ -10,35 +10,35 @@ import SwiftData
 import Charts
 
 struct WorkoutDetailView: View {
-    let workout: ExcerciseDataType
+    let exercise: Exercise
 
-    init(workout: ExcerciseDataType) {
-        self.workout = workout
+    init(exercise: Exercise) {
+        self.exercise = exercise
     }
 
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 20) {
-                Text(workout.name)
+                Text(exercise.name)
                     .font(.largeTitle)
                     .fontWeight(.medium)
 
-                if case .strength = workout.type,
-                   let sets = workout.sets {
+                if case .strength = exercise.type,
+                   let sets = exercise.sets {
                     ForEach(sets.indices, id: \.self) { setIndex in
                         WorkoutDataView(label: "Weight", value: "\(sets[setIndex].weightInLbs) lbs")
                         WorkoutDataView(label: "Reps", value: "\(sets[setIndex].reps)")
                     }
                 }
 
-                WorkoutDataView(label: "Date", value: workout.date.formatted(date: .long, time: .omitted))
+                WorkoutDataView(label: "Date", value: exercise.date.formatted(date: .long, time: .omitted))
 
                 Text("Progress Chart")
                     .font(.title3)
                     .fontWeight(.medium)
                     .padding(.top)
 
-                WorkoutChartView(workout.name)
+                WorkoutChartView(exercise.name)
                     .frame(height: 300)
                 .padding()
 

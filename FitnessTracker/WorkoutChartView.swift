@@ -15,26 +15,26 @@ struct WorkoutChartView: View {
 
     @State private var dateRange: ClosedRange<Date>
 
-    @Query private var workouts: [ExcerciseDataType]
+    @Query private var exercises: [Exercise]
 
-    init(_ workoutName: String) {
+    init(_ exerciseName: String) {
         let endDate = Date()
         let startDate = Calendar.current.date(byAdding: .day, value: -30, to: endDate)!
         _dateRange = State(initialValue: startDate...endDate)
-        _workouts = Query(filter: WorkoutChartView.workoutsFilteredByName(workoutName), sort: \ExcerciseDataType.date, order: .reverse)
+        _exercises = Query(filter: WorkoutChartView.exercisesFilteredByName(exerciseName), sort: \Exercise.date, order: .reverse)
     }
 
     var body: some View {
         Chart {
-            ForEach(workouts, id: \.date) { workout in
-              if case .strength = workout.type {
+            ForEach(exercises, id: \.date) { exercise in
+              if case .strength = exercise.type {
                     LineMark(
-                        x: .value("Date", workout.date),
-                        y: .value("Weight", workout.maxWeight)
+                        x: .value("Date", exercise.date),
+                        y: .value("Weight", exercise.maxWeight)
                     )
                     PointMark(
-                        x: .value("Date", workout.date),
-                        y: .value("Weight", workout.maxWeight)
+                        x: .value("Date", exercise.date),
+                        y: .value("Weight", exercise.maxWeight)
                     )
                 }
             }
@@ -90,8 +90,8 @@ struct WorkoutChartView: View {
         let dayCount = Calendar.current.dateComponents([.day], from: dateRange.lowerBound, to: dateRange.upperBound).day ?? 0
         let calendar = Calendar.current
 
-        // Only show labels for dates with workouts
-        guard workouts.contains(where: { calendar.isDate($0.date, inSameDayAs: date) }) else {
+        // Only show labels for dates with exercises
+        guard exercises.contains(where: { calendar.isDate($0.date, inSameDayAs: date) }) else {
             return false
         }
 
@@ -116,7 +116,7 @@ struct WorkoutChartView: View {
         return formatter.string(from: date)
     }
 
-    private static func workoutsFilteredByName(_ workoutName: String) -> Predicate<ExcerciseDataType> {
-        return #Predicate<ExcerciseDataType> { $0.name == workoutName}
+    private static func exercisesFilteredByName(_ exerciseName: String) -> Predicate<Exercise> {
+        return #Predicate<Exercise> { $0.name == exerciseName}
     }
 }

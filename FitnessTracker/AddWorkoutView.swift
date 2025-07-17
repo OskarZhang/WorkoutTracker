@@ -18,16 +18,16 @@ struct AddWorkoutView: View {
     @Binding var isPresented: Bool
     @Environment(\.colorScheme) var colorScheme
 
-    init(isPresented: Binding<Bool>, workoutService: WorkoutService) {
+    init(isPresented: Binding<Bool>, exerciseService: ExerciseService) {
         self._isPresented = isPresented
-        self.viewModel = .init(service: workoutService)
+        self.viewModel = .init(service: exerciseService)
     }
 
     var body: some View {
         NavigationView {
             List {
 
-                TextField("Add workout", text: $viewModel.workoutName)
+                TextField("Add exercise", text: $viewModel.exerciseName)
                     .autocorrectionDisabled(true)
                     .font(.largeTitle)
                     .focused($isNameFocused)
@@ -55,7 +55,7 @@ struct AddWorkoutView: View {
                 Stepper("Sets \(viewModel.setCount)", value: $viewModel.setCount, in: 1...10)
                     .listRowSeparator(.hidden)
 
-                DatePicker("Date", selection: $viewModel.workoutDate, displayedComponents: .date)
+                DatePicker("Date", selection: $viewModel.exerciseDate, displayedComponents: .date)
                     .listRowSeparator(.hidden)
 
                 Text("Weight")
@@ -68,16 +68,16 @@ struct AddWorkoutView: View {
             .keyboardToolbar {
                     ScrollView(.horizontal, showsIndicators: false) {
                         HStack(alignment: .bottom) {
-                            ForEach(viewModel.suggestWorkoutNames()) { workout in
-                                Button(workout.name) {
-                                    switch workout.type {
+                            ForEach(viewModel.suggestWorkoutNames()) { exercise in
+                                Button(exercise.name) {
+                                    switch exercise.type {
                                     case .cardio:
                                         break
                                     case .strength:
-                                        self.viewModel.weight = Int(workout.maxWeight)
-                                        self.viewModel.repCount = workout.maxRep
-                                        self.viewModel.setCount = workout.sets?.count ?? 0
-                                        self.viewModel.workoutName = workout.name
+                                        self.viewModel.weight = Int(exercise.maxWeight)
+                                        self.viewModel.repCount = exercise.maxRep
+                                        self.viewModel.setCount = exercise.sets?.count ?? 0
+                                        self.viewModel.exerciseName = exercise.name
                                     }
                                 }
                                 .buttonStyle(.bordered)
