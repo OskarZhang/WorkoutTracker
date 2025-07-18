@@ -23,6 +23,9 @@ struct ContentView: View {
                     Text("Trends")
             }
         }
+        .overlay(alignment: .bottom) {
+            RestTimerView()
+        }
         .tint(colorScheme == .dark ? Color.white : Color(UIColor.black))
     }
 }

@@ -17,6 +17,7 @@ struct AddWorkoutView: View {
 
     @Binding var isPresented: Bool
     @Environment(\.colorScheme) var colorScheme
+    @EnvironmentObject var restTimerManager: RestTimerManager
     
     init(isPresented: Binding<Bool>, workoutService: WorkoutService) {
         self._isPresented = isPresented
@@ -96,6 +97,7 @@ struct AddWorkoutView: View {
 
     private func saveWorkout() {
         viewModel.save()
+        restTimerManager.startTimer(for: viewModel.workoutName)
         isPresented = false
     }
 
