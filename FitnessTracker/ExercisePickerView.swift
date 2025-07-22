@@ -17,24 +17,21 @@ struct ExercisePickerView: View {
     }
 
     var body: some View {
-        NavigationView {
-            VStack {
-                List(filteredExercises, id: \.self) { exercise in
-                    Button(action: {
-                        selectedExercise = exercise
-                        isPresented = false
-                    }) {
-                        Text(exercise)
-                    }
+        VStack {
+            List(filteredExercises, id: \.self) { exercise in
+                Button(action: {
+                    selectedExercise = exercise
+                }) {
+                    Text(exercise)
                 }
-                .searchable(text: $searchContext.searchText)
             }
-            .navigationTitle("Select Exercise")
-            .onAppear(perform: loadExercises)
-            .navigationBarItems(trailing: Button("Cancel") {
-                isPresented = false
-            })
+            .searchable(text: $searchContext.searchText)
         }
+        .navigationTitle("Select Exercise")
+        .onAppear(perform: loadExercises)
+        .navigationBarItems(trailing: Button("Cancel") {
+            isPresented = false
+        })
     }
 
     private func loadExercises() {

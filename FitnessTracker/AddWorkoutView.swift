@@ -1,41 +1,37 @@
 import SwiftUI
 
 struct AddWorkoutView: View {
-    @State private var showingExercisePicker = true
-    @State private var showingSetLogging = false
-    @State private var selectedExercise: String = ""
-
+    @StateObject private var viewModel: AddWorkoutViewModel
     @Binding var isPresented: Bool
-    let exerciseService: ExerciseService
+
+    init(isPresented: Binding<Bool>, exerciseService: ExerciseService) {
+        self._isPresented = isPresented
+        _viewModel = StateObject(wrappedValue: AddWorkoutViewModel(exerciseService: exerciseService))
+    }
 
     var body: some View {
-        VStack {
-            EmptyView()
-        }
-        .sheet(isPresented: $showingExercisePicker) {
+        NavigationView {
             ExercisePickerView(
-                isPresented: $showingExercisePicker,
-                selectedExercise: $selectedExercise
+                isPresented: $isPresented,
+                selectedExercise: Binding(
+                    get: { viewModel.selectedExercise ?? "" },
+                    set: {
+                        viewModel.selectedExercise = $0
+                        if !$0.isEmpty {
+                            viewModel.isShowingSetLogging = true
+                        }
+                    }
+                )
             )
-            .onDisappear(perform: {
-                if !selectedExercise.isEmpty {
-                    showingSetLogging = true
-                } else {
-                    isPresented = false
-                }
-            })
         }
-        .sheet(isPresented: $showingSetLogging) {
+        .sheet(isPresented: $viewModel.isShowingSetLogging) {
             SetLoggingView(
-                isPresented: $showingSetLogging,
-                exerciseName: selectedExercise,
+                isPresented: $viewModel.isShowingSetLogging,
+                exerciseName: viewModel.selectedExercise ?? "",
                 onSave: { sets in
-                    let exercise = Exercise(
-                        name: selectedExercise,
-                        type: .strength,
-                        sets: sets
-                    )
-                    exerciseService.addExercise(exercise)
+                    viewModel.sets = sets
+                    viewModel.saveWorkout()
+                    viewModel.isShowingSetLogging = false
                     isPresented = false
                 }
             )
