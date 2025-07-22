@@ -2,7 +2,13 @@ import Foundation
 import Combine
 
 class AddWorkoutViewModel: ObservableObject {
-    @Published var selectedExercise: String?
+    @Published var selectedExercise: String? {
+        didSet {
+            if selectedExercise != nil {
+                isShowingSetLogging = true
+            }
+        }
+    }
     @Published var sets: [StrengthSet] = []
 
     @Published var isShowingSetLogging = false

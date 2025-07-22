@@ -12,7 +12,7 @@ struct ContentView: View {
 
     var body: some View {
         TabView {
-            ExercisesListView(exerciseService: ExerciseService(modelContext: modelContext))
+            ExercisesListView(exerciseService: ExerciseService(modelContext))
                 .tabItem {
                     Image(systemName: "dumbbell")
                     Text("Exercises")

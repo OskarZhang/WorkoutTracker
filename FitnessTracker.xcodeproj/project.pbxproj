@@ -14,8 +14,6 @@
 		4B31DA2A2CACC2FA005B3984 /* WorkoutChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B31DA292CACC2F5005B3984 /* WorkoutChartView.swift */; };
 		4B78EC452D4825EF005BD630 /* AddWorkoutViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B78EC442D4825EA005BD630 /* AddWorkoutViewModel.swift */; };
 		4B99D9D42E28B60200073F3F /* strength_workout_names.csv in Resources */ = {isa = PBXBuildFile; fileRef = 4B99D9D32E28B60200073F3F /* strength_workout_names.csv */; };
-		4B9E490A2E2EEA5C00C8D273 /* ExercisePickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9E49092E2EEA5C00C8D273 /* ExercisePickerView.swift */; };
-		4B9E490C2E2EEA6A00C8D273 /* SetLoggingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9E490B2E2EEA6A00C8D273 /* SetLoggingView.swift */; };
 		4B9F71D82CA4F81D009706C6 /* CSVExporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9F71D72CA4F81D009706C6 /* CSVExporter.swift */; };
 		4B9F71DA2CA4F9E5009706C6 /* CSVImporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9F71D92CA4F9E5009706C6 /* CSVImporter.swift */; };
 		4BA93FC12C86B7B300973198 /* FitnessTrackerApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BA93FC02C86B7B300973198 /* FitnessTrackerApp.swift */; };
@@ -50,8 +48,6 @@
 		4B78EC442D4825EA005BD630 /* AddWorkoutViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddWorkoutViewModel.swift; sourceTree = "<group>"; };
 		4B85B4812D8BDB1D000E6206 /* FitnessTracker.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = FitnessTracker.entitlements; sourceTree = "<group>"; };
 		4B99D9D32E28B60200073F3F /* strength_workout_names.csv */ = {isa = PBXFileReference; lastKnownFileType = text; path = strength_workout_names.csv; sourceTree = "<group>"; };
-		4B9E49092E2EEA5C00C8D273 /* ExercisePickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExercisePickerView.swift; sourceTree = "<group>"; };
-		4B9E490B2E2EEA6A00C8D273 /* SetLoggingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetLoggingView.swift; sourceTree = "<group>"; };
 		4B9F71D72CA4F81D009706C6 /* CSVExporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CSVExporter.swift; sourceTree = "<group>"; };
 		4B9F71D92CA4F9E5009706C6 /* CSVImporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CSVImporter.swift; sourceTree = "<group>"; };
 		4BA93FBD2C86B7B300973198 /* FitnessTracker.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FitnessTracker.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -104,11 +100,9 @@
 				4BD095A62D7E588100F4769F /* ExerciseService.swift */,
 				4B9F71D72CA4F81D009706C6 /* CSVExporter.swift */,
 				4BA93FC02C86B7B300973198 /* FitnessTrackerApp.swift */,
-				4B9E49092E2EEA5C00C8D273 /* ExercisePickerView.swift */,
 				4B31DA252CACC0A0005B3984 /* ContentView.swift */,
 				4B31DA272CACC176005B3984 /* TrendsView.swift */,
 				4BA93FC22C86B7B300973198 /* ExercisesListView.swift */,
-				4B9E490B2E2EEA6A00C8D273 /* SetLoggingView.swift */,
 				4BB21AA52C86D48300C1DEDE /* AddWorkoutView.swift */,
 				4B78EC442D4825EA005BD630 /* AddWorkoutViewModel.swift */,
 				4BB21AA92C86E11300C1DEDE /* KeyboardToolbar.swift */,
@@ -215,11 +209,9 @@
 				4B31DA262CACC0A7005B3984 /* ContentView.swift in Sources */,
 				4B78EC452D4825EF005BD630 /* AddWorkoutViewModel.swift in Sources */,
 				4B9F71D82CA4F81D009706C6 /* CSVExporter.swift in Sources */,
-				4B9E490A2E2EEA5C00C8D273 /* ExercisePickerView.swift in Sources */,
 				4BA93FC12C86B7B300973198 /* FitnessTrackerApp.swift in Sources */,
 				4BB21AA82C86D4BC00C1DEDE /* Data.swift in Sources */,
 				4BD095A72D7E588300F4769F /* ExerciseService.swift in Sources */,
-				4B9E490C2E2EEA6A00C8D273 /* SetLoggingView.swift in Sources */,
 				4B31DA2A2CACC2FA005B3984 /* WorkoutChartView.swift in Sources */,
 				4BF3492F2CCEFD0C00891FAE /* SliderView.swift in Sources */,
 			);

@@ -11,30 +11,30 @@ struct AddWorkoutView: View {
 
     var body: some View {
         NavigationView {
-            ExercisePickerView(
-                isPresented: $isPresented,
-                selectedExercise: Binding(
-                    get: { viewModel.selectedExercise ?? "" },
-                    set: {
-                        viewModel.selectedExercise = $0
-                        if !$0.isEmpty {
-                            viewModel.isShowingSetLogging = true
-                        }
-                    }
+            VStack {
+                ExercisePickerView(
+                    isPresented: $isPresented,
+                    selectedExercise: Binding(
+                        get: { viewModel.selectedExercise ?? "" },
+                        set: { viewModel.selectedExercise = $0 }
+                    )
                 )
-            )
-        }
-        .sheet(isPresented: $viewModel.isShowingSetLogging) {
-            SetLoggingView(
-                isPresented: $viewModel.isShowingSetLogging,
-                exerciseName: viewModel.selectedExercise ?? "",
-                onSave: { sets in
-                    viewModel.sets = sets
-                    viewModel.saveWorkout()
-                    viewModel.isShowingSetLogging = false
-                    isPresented = false
+                NavigationLink(
+                    destination: SetLoggingView(
+                        isPresented: $viewModel.isShowingSetLogging,
+                        exerciseName: viewModel.selectedExercise ?? "",
+                        onSave: { sets in
+                            viewModel.sets = sets
+                            viewModel.saveWorkout()
+                            viewModel.isShowingSetLogging = false
+                            isPresented = false
+                        }
+                    ),
+                    isActive: $viewModel.isShowingSetLogging
+                ) {
+                    EmptyView()
                 }
-            )
+            }
         }
     }
 }
