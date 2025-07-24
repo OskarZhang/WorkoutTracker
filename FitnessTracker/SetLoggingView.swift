@@ -9,22 +9,40 @@ struct SetLoggingView: View {
 
     var body: some View {
         NavigationView {
-            VStack {
+            VStack(alignment: .leading) {
                 Text(exerciseName)
-                    .font(.largeTitle)
                     .padding()
+                    .font(.largeTitle)
+                    .fontWeight(.medium)
+
 
                 List {
                     ForEach(sets.indices, id: \.self) { index in
                         HStack {
                             Text("Set \(index + 1)")
                             Spacer()
-                            TextField("Weight", value: $sets[index].weightInLbs, formatter: NumberFormatter())
-                                .keyboardType(.decimalPad)
-                                .frame(width: 80)
-                            TextField("Reps", value: $sets[index].reps, formatter: NumberFormatter())
-                                .keyboardType(.numberPad)
-                                .frame(width: 80)
+                            Button {
+                                debugPrint("show picker")
+                            } label: {
+                                HStack {
+                                    Text("\(Int(sets[index].weightInLbs))")
+                                        .multilineTextAlignment(.trailing)
+                                        .frame(maxHeight: .infinity)
+                                    Text("lb")
+                                }
+                                .frame(width: 100)
+                            }
+
+                            Button {
+                                debugPrint("show picker")
+                            } label: {
+                                HStack {
+                                    Text("\(Int(sets[index].reps))")
+                                        .multilineTextAlignment(.trailing)
+                                    Text("reps")
+                                }
+                                .frame(width: 100)
+                            }
                         }
                     }
                     .onDelete(perform: deleteSet)
@@ -33,18 +51,16 @@ struct SetLoggingView: View {
                         Label("Add Set", systemImage: "plus.circle.fill")
                     }
                 }
+                .listStyle(.plain)
+                .selectionDisabled()
             }
-            .navigationTitle("Log Sets")
-            .navigationBarItems(
-                leading: Button("Cancel") {
-                    isPresented = false
-                },
-                trailing: Button("Done") {
-                    onSave(sets)
-                    isPresented = false
-                }
-            )
         }
+        .navigationBarItems(
+            trailing: Button("Done") {
+                onSave(sets)
+                isPresented = false
+            }
+        )
     }
 
     private func addSet() {
