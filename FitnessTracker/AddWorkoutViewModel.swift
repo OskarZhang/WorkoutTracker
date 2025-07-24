@@ -30,4 +30,17 @@ class AddWorkoutViewModel: ObservableObject {
         )
         exerciseService.addExercise(exercise)
     }
+
+    func lastExerciseSession() -> [StrengthSet]? {
+        if let selectedExercise,
+           let lastExercise = exerciseService.lastExerciseSession(matching: selectedExercise)
+        {
+            return lastExercise.sets
+        }
+        return nil
+    }
+
+    func matchExercise(name: String) -> [Exercise] {
+        return exerciseService.getWorkoutSuggestion(exerciseName: name)
+    }
 }

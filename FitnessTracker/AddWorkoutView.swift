@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct AddWorkoutView: View {
-    @StateObject private var viewModel: AddWorkoutViewModel
+    @StateObject var viewModel: AddWorkoutViewModel
     @Binding var isPresented: Bool
 
     init(isPresented: Binding<Bool>, exerciseService: ExerciseService) {
@@ -13,6 +13,7 @@ struct AddWorkoutView: View {
         NavigationView {
             VStack {
                 ExercisePickerView(
+                    viewModel: viewModel,
                     isPresented: $isPresented,
                     selectedExercise: Binding(
                         get: { viewModel.selectedExercise ?? "" },
@@ -21,6 +22,7 @@ struct AddWorkoutView: View {
                 )
                 NavigationLink(
                     destination: SetLoggingView(
+                        sets: viewModel.lastExerciseSession(),
                         isPresented: $viewModel.isShowingSetLogging,
                         exerciseName: viewModel.selectedExercise ?? "",
                         onSave: { sets in

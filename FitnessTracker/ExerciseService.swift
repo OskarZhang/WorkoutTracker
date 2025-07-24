@@ -89,6 +89,10 @@ class ExerciseService {
         }
     }
 
+    func lastExerciseSession(matching name: String) -> Exercise? {
+        return exercises.filter { $0.name.lowercased() == name.lowercased()}.first
+    }
+
     private func predictNextWorkout() -> [Exercise] {
         var lastWorkoutName: String = ExerciseService.StartOfDayWorkoutToken
         if let mostRecentWorkout = exercises.first,

@@ -3,6 +3,8 @@ import Combine
 import SwiftUIIntrospect
 
 struct ExercisePickerView: View {
+    @StateObject var viewModel: AddWorkoutViewModel
+
     @Binding var isPresented: Bool
     @Binding var selectedExercise: String
 
@@ -11,6 +13,9 @@ struct ExercisePickerView: View {
 
     @StateObject private var searchContext = SearchContext()
     @State private var allExercises: [String] = []
+
+
+
 
     var filteredExercises: [String] {
         if searchContext.debouncedSearchText.isEmpty {
@@ -39,34 +44,22 @@ struct ExercisePickerView: View {
                 }
 
             Divider()
-            List(filteredExercises, id: \.self) { exercise in
+            List(viewModel.matchExercise(name: searchContext.searchText), id: \.self) { exercise in
                 Button(action: {
-                    selectedExercise = exercise
+                    selectedExercise = exercise.name
                 }) {
-                    Text(exercise)
+                    Text(exercise.name)
                 }
             }
             .listStyle(.plain)
         }
         .onAppear {
             isNameFocused = true
-            loadExercises()
+
         }
         .navigationBarItems(trailing: Button("Next") {
             selectedExercise = searchContext.searchText
         })
     }
 
-    private func loadExercises() {
-        if let path = Bundle.main.path(forResource: "strength_workout_names", ofType: "csv") {
-            do {
-                let csvString = try String(contentsOfFile: path, encoding: .utf8)
-                let lines = csvString.components(separatedBy: .newlines)
-                // Skip the header line
-                self.allExercises = Array(lines.dropFirst().filter{ !$0.isEmpty })
-            } catch {
-                print("Failed to load exercises from CSV: \(error)")
-            }
-        }
-    }
 }
