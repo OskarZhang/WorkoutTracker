@@ -32,6 +32,9 @@ struct SetLoggingView: View {
         }
     }
 
+    let impactMed = UIImpactFeedbackGenerator(style: .light)
+
+
     @Binding var isPresented: Bool
     @State private var currentFocusIndexStateVar: FocusIndex? = nil
     @State private var hasEdited: [FocusIndex : Bool] = [:]
@@ -66,7 +69,7 @@ struct SetLoggingView: View {
                 if showingNumberPad {
                     VStack(spacing: 16) {
                         Divider()
-                        numberPad
+                        numberPad(currentFocusIndexStateVar?.type ?? .weight)
                     }
                     .transition(.move(edge: .bottom))
                 }
@@ -148,7 +151,7 @@ struct SetLoggingView: View {
     private func numberPadField(_ index: Int, _ type: FocusIndex.RecordType) -> some View {
         HStack {
             Text("\(type == .weight ? Int(sets[index].weightInLbs) : sets[index].reps)")
-                .foregroundStyle(currentFocusIndexStateVar == FocusIndex(setNum: index, type: type) ? .black : .gray)
+                .foregroundStyle(currentFocusIndexStateVar == FocusIndex(setNum: index, type: type) ? .primary : .secondary)
             Text(type.label)
         }
         .onTapGesture {
@@ -166,8 +169,21 @@ struct SetLoggingView: View {
         .frame(width: 100)
     }
     @ViewBuilder
-    private var numberPad: some View {
+    private func numberPad(_ type: FocusIndex.RecordType) -> some View {
         VStack {
+            HStack {
+                if type == .weight {
+                    quickAddWeightButton(5)
+                    quickAddWeightButton(10)
+                    quickAddWeightButton(15)
+                    quickAddWeightButton(20)
+                } else {
+                    quickSetReps(5)
+                    quickSetReps(8)
+                    quickSetReps(12)
+                    quickSetReps(15)
+                }
+            }
             HStack {
                 numberButton(1)
                 numberButton(2)
@@ -207,6 +223,30 @@ struct SetLoggingView: View {
         }
     }
 
+    private func quickAddWeight(weightAddition: Int) {
+        guard let currentFocusIndexState = currentFocusIndexStateVar else {
+            return
+        }
+        guard currentFocusIndexState.type == .weight else {
+            assert(false, "Something seriously is wrong")
+            return
+        }
+        sets[currentFocusIndexState.setNum].weightInLbs = sets[currentFocusIndexState.setNum].weightInLbs + Double(weightAddition)
+
+    }
+
+    private func quickSetReps(reps: Int) {
+        guard let currentFocusIndexState = currentFocusIndexStateVar else {
+            return
+        }
+        guard currentFocusIndexState.type == .rep else {
+            assert(false, "Something seriously is wrong")
+            return
+        }
+        sets[currentFocusIndexState.setNum].reps = reps
+
+    }
+
     private func backspaceTapped() {
         guard let currentFocusIndexState = currentFocusIndexStateVar else {
             return
@@ -229,10 +269,48 @@ struct SetLoggingView: View {
     }
 
     @ViewBuilder
+    private func quickAddWeightButton(_ weight: Int) -> some View {
+        Button {
+            impactMed.impactOccurred()
+            quickAddWeight(weightAddition: weight)
+        } label: {
+            Text("+\(weight) lb")
+                .font(.system(size: 24, weight: .medium))
+                .frame(maxWidth: .infinity)
+                .frame(height: 40)
+                .background(
+                    RoundedRectangle(cornerRadius: 8, style: .continuous)
+                        .fill(Color(.systemGray5))
+                )
+                .foregroundColor(.primary)
+        }
+        .buttonStyle(PlainButtonStyle())
+    }
+
+    @ViewBuilder
+    private func quickSetReps(_ reps: Int) -> some View {
+        Button {
+            impactMed.impactOccurred()
+            quickSetReps(reps: reps)
+        } label: {
+            Text("\(reps) reps")
+                .font(.system(size: 24, weight: .medium))
+                .frame(maxWidth: .infinity)
+                .frame(height: 40)
+                .background(
+                    RoundedRectangle(cornerRadius: 8, style: .continuous)
+                        .fill(Color(.systemGray5))
+                )
+                .foregroundColor(.primary)
+        }
+        .buttonStyle(PlainButtonStyle())
+    }
+
+    @ViewBuilder
     private func numberButton(_ number: Int) -> some View {
         Button {
+            impactMed.impactOccurred()
             updateCurrentFocusedField(numberTapped: number)
-
         } label: {
             Text("\(number)")
                 .font(.system(size: 36, weight: .medium))
@@ -250,6 +328,7 @@ struct SetLoggingView: View {
     @ViewBuilder
     private var nextButton: some View {
         Button {
+            impactMed.impactOccurred()
             nextButtonTapped()
         } label: {
             Text("Next")
@@ -257,7 +336,7 @@ struct SetLoggingView: View {
                 .frame(maxWidth: .infinity)
                 .frame(height: 60)
                 .background(
-                    RoundedRectangle(cornerRadius: 12, style: .continuous)
+                    RoundedRectangle(cornerRadius: 8, style: .continuous)
                         .fill(Color(.systemGray5))
                 )
                 .foregroundColor(.primary)
@@ -269,6 +348,7 @@ struct SetLoggingView: View {
     @ViewBuilder
     private var backspaceButton: some View {
         Button {
+            impactMed.impactOccurred()
             backspaceTapped()
         } label: {
             Image(systemName: "delete.backward")
