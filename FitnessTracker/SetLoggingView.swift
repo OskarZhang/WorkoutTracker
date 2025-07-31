@@ -5,6 +5,14 @@ struct SetLoggingView: View {
     private struct FocusIndex: Equatable, Hashable {
         enum RecordType {
             case weight, rep
+            var label: String {
+                switch self {
+                case .weight:
+                    return "lb"
+                case .rep:
+                    return "rep"
+                }
+            }
         }
         var setNum: Int
         var type: RecordType
@@ -25,15 +33,16 @@ struct SetLoggingView: View {
     }
 
     @Binding var isPresented: Bool
-    @State private var currentFocusIndexStateVar: FocusIndex? = .initial
+    @State private var currentFocusIndexStateVar: FocusIndex? = nil
     @State private var hasEdited: [FocusIndex : Bool] = [:]
     @State private var valueMatrix: [[String]]
 
-    @FocusState private var currentFocusIndex: FocusIndex?
+//    @FocusState private var currentFocusIndex: FocusIndex?
     @State var weight: Int = 0
     @State var reps: Int = 0
     let exerciseName: String
     let onSave: ([StrengthSet]) -> Void
+    @State var showingNumberPad: Bool = false
 
     @State private var sets: [StrengthSet] = [StrengthSet(weightInLbs: 0, reps: 0)]
 
@@ -51,26 +60,38 @@ struct SetLoggingView: View {
 
     var body: some View {
         NavigationView {
-            addSetView()
-                .toolbar {
-                    ToolbarItemGroup(placement: .keyboard) {
-                        Spacer()
+            VStack() {
+                addSetView()
 
-                        Button("Next") {
-
-                            let nextFocus = currentFocusIndexStateVar?.next()
-                            currentFocusIndexStateVar = nextFocus
-                            if let currentFocusIndexStateVar,
-                               currentFocusIndexStateVar.setNum + 1 > sets.count
-                            {
-                                addSet()
-                            }
-                        }
+                if showingNumberPad {
+                    VStack(spacing: 16) {
+                        Divider()
+                        numberPad
                     }
-            }
-                .onChange(of: currentFocusIndexStateVar) { newValue in
-                    currentFocusIndex = newValue
+                    .transition(.move(edge: .bottom))
                 }
+
+            }
+
+//                .toolbar {
+//                    ToolbarItemGroup(placement: .keyboard) {
+//                        Spacer()
+//
+//                        Button("Next") {
+//
+//                            let nextFocus = currentFocusIndexStateVar?.next()
+//                            currentFocusIndexStateVar = nextFocus
+//                            if let currentFocusIndexStateVar,
+//                               currentFocusIndexStateVar.setNum + 1 > sets.count
+//                            {
+//                                addSet()
+//                            }
+//                        }
+//                    }
+//            }
+//                .onChange(of: currentFocusIndexStateVar) { newValue in
+//                    currentFocusIndex = newValue
+//                }
 //                .onChange(of: currentFocusIndex, { oldValue, newValue in
 //                    guard let currentFocusIndex else {
 //                        return
@@ -91,39 +112,10 @@ struct SetLoggingView: View {
         )
     }
 
-//    // Helper to create a binding to a specific cell
-//    private func bindingFor(_ focusIndex: FocusIndex) -> Binding<String> {
-//        Binding(
-//            get: {
-//                if hasEdited[focusIndex] == nil {
-//                    return ""
-//                }
-//
-//
-//                if focusIndex.type == .rep {
-//                    return self.valueMatrix[focusIndex.setNum][1]
-//                } else {
-//                    return self.valueMatrix[focusIndex.setNum][0]
-//                }
-//
-//            },
-//            set: { newValue in
-//                hasEdited[focusIndex] = true
-//                if focusIndex.type == .rep {
-//                    self.valueMatrix[focusIndex.setNum][1] = newValue
-////                    sets[focusIndex.setNum].reps = Int(newValue) ?? 0
-//                } else {
-//                    self.valueMatrix[focusIndex.setNum][0] = newValue
-////                    sets[focusIndex.setNum].weightInLbs = Double(newValue) ?? 0.0
-//                }
-//
-//            }
-//        )
-//    }
-
 
     @ViewBuilder
     func addSetView() -> some View {
+
         VStack(alignment: .leading) {
             Text(exerciseName)
                 .padding()
@@ -135,55 +127,8 @@ struct SetLoggingView: View {
                     HStack {
                         Text("Set \(index + 1)")
                         Spacer()
-                        HStack {
-                            TextField("\(Int(sets[index].weightInLbs))", text: Binding(
-                                    get: { valueMatrix[index][0] },
-                                    set: { (newValue, transaction) in
-
-                                        var copy = valueMatrix
-                                        copy[index][0] = newValue
-                                        valueMatrix = copy // This triggers the update
-                                        sets[index].weightInLbs = Double(newValue) ?? 0.0
-                                    }
-                                ))
-                                .multilineTextAlignment(.trailing)
-                                .keyboardType(.numberPad)
-                                .focused($currentFocusIndex, equals: FocusIndex(setNum: index, type: .weight))
-                                .textFieldStyle(.plain)
-                                .listRowSeparator(.hidden)
-
-                            Text("lb")
-                        }
-                        .onTapGesture {
-                            currentFocusIndex = FocusIndex(setNum: index, type: .weight)
-                        }
-
-                        .frame(width: 100)
-
-
-                        HStack {
-                            TextField("\(sets[index].reps)", text: Binding(
-                                get: { valueMatrix[index][1] },
-                                set: { (newValue, transaction) in
-
-                                    var copy = valueMatrix
-                                    copy[index][1] = newValue
-                                    valueMatrix = copy // This triggers the update
-                                    sets[index].reps = Int(newValue) ?? 0
-                                }
-                            ))
-                                .multilineTextAlignment(.trailing)
-                                .keyboardType(.numberPad)
-                                .focused($currentFocusIndex, equals: FocusIndex(setNum: index, type: .rep))
-                                .textFieldStyle(.plain)
-                                .listRowSeparator(.hidden)
-                            Text("reps")
-                        }
-                        .onTapGesture {
-                            currentFocusIndex = FocusIndex(setNum: index, type: .rep)
-                        }
-
-                        .frame(width: 100)
+                        numberPadField(index, .weight)
+                        numberPadField(index, .rep)
                     }
                 }
                 .onDelete(perform: deleteSet)
@@ -196,6 +141,148 @@ struct SetLoggingView: View {
             .listStyle(.plain)
             .selectionDisabled()
         }
+    }
+
+
+    @ViewBuilder
+    private func numberPadField(_ index: Int, _ type: FocusIndex.RecordType) -> some View {
+        HStack {
+            Text("\(type == .weight ? Int(sets[index].weightInLbs) : sets[index].reps)")
+                .foregroundStyle(currentFocusIndexStateVar == FocusIndex(setNum: index, type: type) ? .black : .gray)
+            Text(type.label)
+        }
+        .onTapGesture {
+            withAnimation {
+                if showingNumberPad && currentFocusIndexStateVar == FocusIndex(setNum: index, type: type) {
+                    // only disappear keyboard in this instance
+                    showingNumberPad = false
+                    currentFocusIndexStateVar = nil
+                } else {
+                    showingNumberPad = true
+                    currentFocusIndexStateVar = FocusIndex(setNum: index, type: type)
+                }
+            }
+        }
+        .frame(width: 100)
+    }
+    @ViewBuilder
+    private var numberPad: some View {
+        VStack {
+            HStack {
+                numberButton(1)
+                numberButton(2)
+                numberButton(3)
+            }
+
+            HStack {
+                numberButton(4)
+                numberButton(5)
+                numberButton(6)
+            }
+
+            HStack {
+                numberButton(7)
+                numberButton(8)
+                numberButton(9)
+            }
+            HStack {
+                backspaceButton
+                numberButton(0)
+                nextButton
+            }
+        }
+        .padding(.leading, 8)
+        .padding(.trailing, 8)
+
+    }
+
+    private func updateCurrentFocusedField(numberTapped: Int) {
+        guard let currentFocusIndexState = currentFocusIndexStateVar else {
+            return
+        }
+        if currentFocusIndexState.type == .rep {
+            sets[currentFocusIndexState.setNum].reps = sets[currentFocusIndexState.setNum].reps * 10 + numberTapped
+        } else {
+            sets[currentFocusIndexState.setNum].weightInLbs = sets[currentFocusIndexState.setNum].weightInLbs * 10 + Double(numberTapped)
+        }
+    }
+
+    private func backspaceTapped() {
+        guard let currentFocusIndexState = currentFocusIndexStateVar else {
+            return
+        }
+        if currentFocusIndexState.type == .rep {
+            sets[currentFocusIndexState.setNum].reps = sets[currentFocusIndexState.setNum].reps / 10
+        } else {
+            sets[currentFocusIndexState.setNum].weightInLbs = floor(sets[currentFocusIndexState.setNum].weightInLbs / 10)
+        }
+    }
+
+    private func nextButtonTapped() {
+        let nextFocus = currentFocusIndexStateVar?.next()
+        currentFocusIndexStateVar = nextFocus
+        if let currentFocusIndexStateVar,
+           currentFocusIndexStateVar.setNum + 1 > sets.count
+        {
+            addSet()
+        }
+    }
+
+    @ViewBuilder
+    private func numberButton(_ number: Int) -> some View {
+        Button {
+            updateCurrentFocusedField(numberTapped: number)
+
+        } label: {
+            Text("\(number)")
+                .font(.system(size: 36, weight: .medium))
+                .frame(maxWidth: .infinity)
+                .frame(height: 60)
+                .background(
+                    RoundedRectangle(cornerRadius: 8, style: .continuous)
+                        .fill(Color(.systemGray5))
+                )
+                .foregroundColor(.primary)
+        }
+        .buttonStyle(PlainButtonStyle())
+    }
+
+    @ViewBuilder
+    private var nextButton: some View {
+        Button {
+            nextButtonTapped()
+        } label: {
+            Text("Next")
+                .font(.system(size: 30, weight: .medium))
+                .frame(maxWidth: .infinity)
+                .frame(height: 60)
+                .background(
+                    RoundedRectangle(cornerRadius: 12, style: .continuous)
+                        .fill(Color(.systemGray5))
+                )
+                .foregroundColor(.primary)
+
+        }
+        .buttonStyle(PlainButtonStyle())
+    }
+
+    @ViewBuilder
+    private var backspaceButton: some View {
+        Button {
+            backspaceTapped()
+        } label: {
+            Image(systemName: "delete.backward")
+                .font(.system(size: 30, weight: .medium))
+                .frame(maxWidth: .infinity)
+                .frame(height: 60)
+                .background(
+                    RoundedRectangle(cornerRadius: 12, style: .continuous)
+                        .fill(Color(.systemGray5))
+                )
+                .foregroundColor(.primary)
+
+        }
+        .buttonStyle(PlainButtonStyle())
     }
 
 

@@ -16,7 +16,6 @@ struct ExercisePickerView: View {
 
 
 
-
     var filteredExercises: [String] {
         if searchContext.debouncedSearchText.isEmpty {
             return allExercises
