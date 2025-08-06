@@ -1,10 +1,3 @@
-//
-//  Recommender.swift
-//  FitnessTracker
-//
-//  Created by Oskar Zhang on 3/9/25.
-//
-
 import SwiftData
 import Foundation
 
@@ -17,7 +10,7 @@ class ExerciseService {
     private var transitions: [String: [String: Int]] = [:]
     private var transitionProbabilities: [String: [String: Double]] = [:]
     private var exercises: [Exercise] = []
-    
+
 
     lazy var exerciseNamesFromCSV: [String] = {
         guard let url = Bundle.main.url(forResource: "strength_workout_names", withExtension: "csv") else {
@@ -38,7 +31,7 @@ class ExerciseService {
         }
     }()
 
-    init(_ modelContext: ModelContext) {
+    init(modelContext: ModelContext) {
         self.modelContext = modelContext
         self.exercises = fetchWorkouts()
         Task {
@@ -96,6 +89,10 @@ class ExerciseService {
         }
     }
 
+    func lastExerciseSession(matching name: String) -> Exercise? {
+        return exercises.filter { $0.name.lowercased() == name.lowercased()}.first
+    }
+
     private func predictNextWorkout() -> [Exercise] {
         var lastWorkoutName: String = ExerciseService.StartOfDayWorkoutToken
         if let mostRecentWorkout = exercises.first,
@@ -112,7 +109,7 @@ class ExerciseService {
         return res
     }
 
-    func addWorkout(exercise: Exercise) {
+    func addExercise(_ exercise: Exercise) {
         modelContext.insert(exercise)
         exercises.insert(exercise, at: 0)
     }
