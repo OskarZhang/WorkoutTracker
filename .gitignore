@@ -1,0 +1,99 @@
+# macOS
+.DS_Store
+
+###############
+# Xcode Builds #
+###############
+# Build products and intermediate build files
+build/
+DerivedData/
+
+# User-specific files and settings
+*.xcuserstate
+*.pbxuser
+!default.pbxuser
+*.mode1v3
+!default.mode1v3
+*.mode2v3
+!default.mode2v3
+*.mode3v3
+!default.mode3v3
+*.perspectivev3
+!default.perspectivev3
+
+# Schemes & workspace user data
+xcuserdata/
+*.xccheckout
+*.xcscmblueprint
+*.moved-aside
+
+# Ignore entire workspace except the shared data that should be committed
+*.xcworkspace
+!*.xcworkspace/contents.xcworkspacedata
+!*.xcworkspace/xcshareddata/**
+
+# Ignore everything inside Xcode projects except project file and shared data
+*.xcodeproj/*
+!*.xcodeproj/project.pbxproj
+!*.xcodeproj/xcshareddata/**
+
+############################
+# Swift Package Manager (SPM)
+############################
+.build/
+.swiftpm/xcode/
+# Uncomment the next line to stop tracking resolved versions.
+# Package.resolved
+
+#############
+# CocoaPods #
+#############
+Pods/
+
+############
+# Carthage #
+############
+Carthage/Build/
+
+############
+# Fastlane #
+############
+fastlane/report.xml
+fastlane/Preview.html
+fastlane/screenshots/
+fastlane/test_output/
+
+#############
+# Archives & Artifacts #
+#############
+*.ipa
+*.xcarchive
+
+#############
+# Core Data / Realm #
+#############
+*.sqlite
+*.sqlite-wal
+*.sqlite-shm
+*.realm
+*.realm.lock
+
+##############
+# Playgrounds #
+##############
+Timeline.xctimeline
+Playground.playground/contents.swift
+
+###########
+# General #
+###########
+# IDEs
+.idea/
+
+# Vim
+*~
+*.swp
+
+# VSCode / Cursor
+.vscode/
+.cursor/
