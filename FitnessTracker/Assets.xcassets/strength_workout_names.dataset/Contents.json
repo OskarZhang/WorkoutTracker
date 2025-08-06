@@ -1,0 +1,12 @@
+{
+  "data" : [
+    {
+      "filename" : "strength_workout_names.csv",
+      "idiom" : "universal"
+    }
+  ],
+  "info" : {
+    "author" : "xcode",
+    "version" : 1
+  }
+}

@@ -1,27 +1,43 @@
 import SwiftUI
 import SwiftData
+import HealthKitUI
+import Combine
+
+class SearchContext: ObservableObject {
+
+    @Published var searchText: String = ""
+    @Published var debouncedSearchText: String = ""
+
+    init() {
+        $searchText
+            .debounce(for: .seconds(0.3), scheduler: RunLoop.main)
+            .assign(to: &$debouncedSearchText)
+    }
+}
 
 struct ExercisesListView: View {
     @Environment(\.modelContext) private var modelContext
-    @Query(sort: \Workout.date, order: .reverse) private var workouts: [Workout]
-    
-    let workoutService: WorkoutService
-    
-    init(workoutService: WorkoutService) {
-        self.workoutService = workoutService
+    @Query(sort: \Exercise.date, order: .reverse) private var exercises: [Exercise]
+
+    let exerciseService: ExerciseService
+
+    init(exerciseService: ExerciseService) {
+        self.exerciseService = exerciseService
     }
-    
-    var groupedWorkouts: [(date: Date, workouts: [Workout])] {
+
+    var groupedWorkouts: [(date: Date, exercises: [Exercise])] {
         let startTime = Date().timeIntervalSince1970
-        let groupedDict = Dictionary(grouping: workouts) { workout in
+        let groupedDict = Dictionary(grouping: exercises.filter({ exercise in
+            searchContext.debouncedSearchText.isEmpty || exercise.name.lowercased().contains(searchContext.debouncedSearchText.lowercased())
+        })) { exercise in
             // Normalize the date to remove time components
-            Calendar.current.startOfDay(for: workout.date)
+            Calendar.current.startOfDay(for: exercise.date)
         }
         // Sort the dates in descending order
         let sortedDates = groupedDict.keys.sorted(by: >)
         // Map the sorted dates to an array of tuples
         let res = sortedDates.map { date in
-            (date: date, workouts: groupedDict[date]!)
+            (date: date, exercises: groupedDict[date]!)
         }
         let endTime = Date().timeIntervalSince1970
         debugPrint("grouping perf \(endTime - startTime)s")
@@ -39,25 +55,31 @@ struct ExercisesListView: View {
     @State private var showErrorAlert: Bool = false
     @State private var errorMessage: String = ""
 
+    // health data
+    @State var authenticated = false
+    @State var trigger = false
+
+    @StateObject var searchContext = SearchContext()
+
     var body: some View {
         NavigationView {
             ZStack {
                 VStack {
-                    if workouts.isEmpty {
-                        Text("No workouts found in the last 7 days")
+                    if exercises.isEmpty {
+                        Text("No exercises found in the last 7 days")
                     } else {
                         List {
                             ForEach(groupedWorkouts, id: \.date) { group in
                                 Section(header: Text(ExercisesListView.formattedDate(group.date))) {
-                                    ForEach(group.workouts) { workout in
-                                        WorkoutRow(workout: workout).background(NavigationLink("", destination: WorkoutDetailView(workout: workout))
+                                    ForEach(group.exercises) { exercise in
+                                        WorkoutRow(exercise: exercise).background(NavigationLink("", destination: WorkoutDetailView(exercise: exercise))
                                             .opacity(0)
                                         )
                                         .listRowSeparator(.hidden)
                                     }
                                     .onDelete(perform: deleteWorkouts)
                                 }
-                                
+
                             }
                         }
                         .listStyle(.plain)
@@ -67,16 +89,17 @@ struct ExercisesListView: View {
                 .toolbar {
                     Button("", systemImage: "gear") {
                         showingSettings = true
-                        exportAndPrepareShare()
+                        // todo: re-enable export
+//                        exportAndPrepareShare()
                     }
-                    
+
                 }
                 .confirmationDialog("", isPresented: $showingSettings) {
                     Button("Import") {
                         showingImportFileSelector.toggle()
                         print("tapped")
                     }
-                    
+
                     if let csvURL = exportedCSVFileURL {
                         ShareLink(item: csvURL) {
                             Label("Export", systemImage: "square.and.arrow.up")
@@ -100,7 +123,7 @@ struct ExercisesListView: View {
                         print(error)
                     }
                 }
-                
+
                 VStack {
                     Spacer()
                     HStack {
@@ -119,20 +142,21 @@ struct ExercisesListView: View {
                 }
             }
         }
+        .searchable(text: $searchContext.searchText)
         .sheet(isPresented: $isAddingWorkout) {
-            AddWorkoutView(isPresented: $isAddingWorkout, workoutService: workoutService)
+            AddWorkoutView(isPresented: $isAddingWorkout, exerciseService: exerciseService)
         }
     }
-    
+
     private func deleteWorkouts(offsets: IndexSet) {
         withAnimation {
             for index in offsets {
                 print("deleting index \(index)")
-                modelContext.delete(workouts[index])
+                modelContext.delete(exercises[index])
             }
         }
     }
-    
+
     private func importFrom(fileURL: URL) {
         let importer = CSVImporter()
         _ = fileURL.startAccessingSecurityScopedResource()
@@ -141,57 +165,53 @@ struct ExercisesListView: View {
             let csvInput = try String(contentsOf: fileURL)
 
             // Parse the CSV
-            let workouts = try importer.importCSV(csvString: csvInput)
-            
-            // Use the parsed workouts
-            for workout in workouts {
-                print("Workout ID: \(workout.id)")
-                print("Name: \(workout.name)")
-                switch workout.type {
-                case .strength(let weight, let reps, let sets):
+            let exercises = try importer.importCSV(csvString: csvInput)
+
+            // Use the parsed exercises
+            for exercise in exercises {
+                print("Workout ID: \(exercise.id)")
+                print("Name: \(exercise.name)")
+              switch exercise.type {
+                case .strength:
                     print("Type: Strength")
-                    print("Weight: \(weight) lbs")
-                    print("Reps: \(reps)")
-                    print("Sets: \(sets)")
-                case .cardio(let duration):
+                case .cardio:
                     print("Type: Cardio")
-                    print("Duration: \(duration) minutes")
                 }
-                modelContext.insert(workout)
+                modelContext.insert(exercise)
             }
         } catch {
             print("Failed to import CSV: \(error.localizedDescription)")
         }
     }
-    
-    /// Function to export workouts to CSV and prepare the shareable file
+
+    /// Function to export exercises to CSV and prepare the shareable file
     private func exportAndPrepareShare() {
         let exporter = CSVExporter()
-        let csvString = exporter.export(workouts: workouts)
-        
+        let csvString = exporter.export(exercises: exercises)
+
         // Define the temporary file URL
         let tempDirectory = FileManager.default.temporaryDirectory
-        let fileName = "workouts_\(Date().timeIntervalSince1970).csv"
+        let fileName = "exercises_\(Date().timeIntervalSince1970).csv"
         let fileURL = tempDirectory.appendingPathComponent(fileName)
-        
+
         do {
             // Write the CSV string to the temporary file
             try csvString.write(to: fileURL, atomically: true, encoding: .utf8)
             // Update the state to trigger ShareSheet
             exportedCSVFileURL = fileURL
-            
+
         } catch {
             print("Failed to write CSV file: \(error.localizedDescription)")
-            errorMessage = "Failed to export workouts. Please try again."
+            errorMessage = "Failed to export exercises. Please try again."
             showErrorAlert = true
         }
     }
-    
-    private static func recentFilter() -> Predicate<Workout> {
+
+    private static func recentFilter() -> Predicate<Exercise> {
         let recentCutOffDate = Date().addingTimeInterval(-7 * 24 * 60 * 60)
-        return #Predicate<Workout> { $0.date >= recentCutOffDate}
+        return #Predicate<Exercise> { $0.date >= recentCutOffDate}
     }
-    
+
     private static func formattedDate(_ date: Date) -> String {
         let calendar = Calendar.current
         if calendar.isDateInToday(date) {
@@ -206,23 +226,21 @@ struct ExercisesListView: View {
     }
 }
 
-
-
 struct WorkoutRow: View {
-    let workout: Workout
-    
+    let exercise: Exercise
+
     var body: some View {
         VStack(alignment: .leading) {
-                
-            Text(workout.name)
+
+            Text(exercise.name)
                 .font(.system(size: 20, weight: .medium))
-            
-            switch workout.type {
-            case .strength(let weight, let repCount, let setCount):
-                Text("\(weight) lbs, \(repCount) reps, \(setCount) sets")
+
+            switch exercise.type {
+            case .strength:
+                Text("\(Int(exercise.maxWeight)) lbs, \(exercise.maxRep) reps, \(exercise.sets?.count ?? 0) sets")
                     .font(.callout)
-            case .cardio(let durationMinutes):
-                Text("Cardio: \(durationMinutes) minutes")
+            case .cardio:
+                Text("Cardio: \((exercise.durationInSeconds ?? 0) / 60) minutes")
                     .font(.callout)
             }
         }

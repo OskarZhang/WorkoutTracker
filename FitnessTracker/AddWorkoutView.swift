@@ -10,31 +10,30 @@ import SwiftData
 import SwiftUIIntrospect
 
 struct AddWorkoutView: View {
-    
+
     @State private var viewModel: AddWorkoutViewModel
     @FocusState private var isNameFocused
     @State private var hasSetInitialFocus = false
 
     @Binding var isPresented: Bool
     @Environment(\.colorScheme) var colorScheme
-    @EnvironmentObject var restTimerManager: RestTimerManager
-    
-    init(isPresented: Binding<Bool>, workoutService: WorkoutService) {
+
+    init(isPresented: Binding<Bool>, exerciseService: ExerciseService) {
         self._isPresented = isPresented
-        self.viewModel = .init(service: workoutService)
+        self.viewModel = .init(service: exerciseService)
     }
-    
+
     var body: some View {
         NavigationView {
             List {
 
-                TextField("Add workout", text: $viewModel.workoutName)
+                TextField("Add exercise", text: $viewModel.exerciseName)
                     .autocorrectionDisabled(true)
                     .font(.largeTitle)
                     .focused($isNameFocused)
                     .listRowSeparator(.hidden)
                     .introspect(.textField, on: .iOS(.v13, .v14, .v15, .v16, .v17, .v18), customize: { textField in
-                        if (!hasSetInitialFocus && isPresented) {
+                        if !hasSetInitialFocus && isPresented {
                             textField.becomeFirstResponder()
                             hasSetInitialFocus = true
                         }
@@ -47,7 +46,7 @@ struct AddWorkoutView: View {
                             saveWorkout()
                         }
                     }
-                    
+
                     .submitLabel(.done)
                     .padding(.top, 16)
 
@@ -56,29 +55,29 @@ struct AddWorkoutView: View {
                 Stepper("Sets \(viewModel.setCount)", value: $viewModel.setCount, in: 1...10)
                     .listRowSeparator(.hidden)
 
-                DatePicker("Date", selection: $viewModel.workoutDate, displayedComponents: .date)
+                DatePicker("Date", selection: $viewModel.exerciseDate, displayedComponents: .date)
                     .listRowSeparator(.hidden)
 
                 Text("Weight")
                 SliderView.Representable(value: $viewModel.weight).frame(height: 120)
                     .listRowInsets(EdgeInsets())
                     .listRowSeparator(.hidden)
-                
+
             }
             .listStyle(.plain)
             .keyboardToolbar {
                     ScrollView(.horizontal, showsIndicators: false) {
                         HStack(alignment: .bottom) {
-                            ForEach(viewModel.suggestWorkoutNames()) { workout in
-                                Button(workout.name) {
-                                    switch workout.type {
-                                    case .cardio(_):
+                            ForEach(viewModel.suggestWorkoutNames()) { exercise in
+                                Button(exercise.name) {
+                                    switch exercise.type {
+                                    case .cardio:
                                         break
-                                    case .strength(let weight, let repCount, let setCount):
-                                        self.viewModel.weight = weight
-                                        self.viewModel.repCount = repCount
-                                        self.viewModel.setCount = setCount
-                                        self.viewModel.workoutName = workout.name
+                                    case .strength:
+                                        self.viewModel.weight = Int(exercise.maxWeight)
+                                        self.viewModel.repCount = exercise.maxRep
+                                        self.viewModel.setCount = exercise.sets?.count ?? 0
+                                        self.viewModel.exerciseName = exercise.name
                                     }
                                 }
                                 .buttonStyle(.bordered)

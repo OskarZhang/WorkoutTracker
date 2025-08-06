@@ -12,34 +12,30 @@ import SwiftUI
 
 @Observable
 class AddWorkoutViewModel {
-    var workoutName = ""
+    var exerciseName = ""
     var weight = 0
     var repCount = 5
     var setCount = 5
-    var workoutDate = Date()
-    
-    private let workoutService: WorkoutService
-    
-    init(service: WorkoutService) {
-        self.workoutService = service
+    var exerciseDate = Date()
+
+    private let exerciseService: ExerciseService
+
+    init(service: ExerciseService) {
+        self.exerciseService = service
     }
-    
+
     var isValidInput: Bool {
-        return !workoutName.isEmpty
+        return !exerciseName.isEmpty
     }
 
     func save() {
-        let workoutType = WorkoutType.strength(weight: weight, repCount: repCount, setCount: setCount)
-        let newWorkout = Workout(name: workoutName.replacingOccurrences(of: "\\s+$", with: "", options: .regularExpression), type: workoutType, date: workoutDate)
-        workoutService.addWorkout(workout: newWorkout)
+        let sets = (0..<setCount).map { _ in StrengthSet(weightInLbs: Double(weight), reps: repCount, restSeconds: nil) }
+        let newWorkout = Exercise(date: exerciseDate, name: exerciseName.replacingOccurrences(of: "\\s+$", with: "", options: .regularExpression), type: .strength, sets: sets)
+        exerciseService.addWorkout(exercise: newWorkout)
     }
 
-    func suggestWorkoutNames() -> [Workout] {
-        if workoutName.isEmpty {
-            return workoutService.predictNextWorkout()
-        } else {
-            return workoutService.matchWorkout(workoutName: workoutName)
-        }
+    func suggestWorkoutNames() -> [Exercise] {
+        exerciseService.getWorkoutSuggestion(exerciseName: exerciseName)
     }
 
 }

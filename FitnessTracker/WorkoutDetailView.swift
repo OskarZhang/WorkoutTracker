@@ -10,36 +10,38 @@ import SwiftData
 import Charts
 
 struct WorkoutDetailView: View {
-    let workout: Workout
-    
-    init(workout: Workout) {
-        self.workout = workout
+    let exercise: Exercise
+
+    init(exercise: Exercise) {
+        self.exercise = exercise
     }
-    
+
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 20) {
-                Text(workout.name)
+                Text(exercise.name)
                     .font(.largeTitle)
                     .fontWeight(.medium)
-                
-                if case .strength(let weight, let repCount, let setCount) = workout.type {
-                    WorkoutDataView(label: "Weight", value: "\(weight) lbs")
-                    WorkoutDataView(label: "Reps", value: "\(repCount)")
-                    WorkoutDataView(label: "Sets", value: "\(setCount)")
+                Text(exercise.date.formatted(date: .long, time: .omitted))
+                    .foregroundStyle(.gray)
+                    .fontWeight(.semibold)
+                if case .strength = exercise.type,
+                   let sets = exercise.sets {
+                    ForEach(sets.indices, id: \.self) { setIndex in
+                        StrengthSetView(weight: Int(sets[setIndex].weightInLbs), repCount: sets[setIndex].reps, setNumber: setIndex + 1)
+                    }
                 }
-                
-                WorkoutDataView(label: "Date", value: workout.date.formatted(date: .long, time: .omitted))
-                
+
+
                 Text("Progress Chart")
                     .font(.title3)
                     .fontWeight(.medium)
                     .padding(.top)
-                
-                WorkoutChartView(workout.name)
+
+                WorkoutChartView(exercise.name)
                     .frame(height: 300)
                 .padding()
-                
+
                 Text("Pinch to zoom on the chart")
                     .font(.caption)
                     .foregroundColor(.secondary)
@@ -50,15 +52,20 @@ struct WorkoutDetailView: View {
     }
 }
 
-struct WorkoutDataView: View {
-    let label: String
-    let value: String
-    
+struct StrengthSetView: View {
+    let weight: Int
+    let repCount: Int
+    let setNumber: Int
+
     var body: some View {
         HStack {
-            Text(label)
+            Text("Set \(setNumber)")
+                .foregroundStyle(.gray)
             Spacer()
-            Text(value)
+            Text("\(weight) lb")
+                .fontWeight(.semibold)
+            Spacer()
+            Text("\(repCount) reps")
                 .fontWeight(.semibold)
         }
     }

@@ -6,17 +6,15 @@
 //
 
 import SwiftUI
+import SwiftData
 
 @main
 struct FitnessTrackerApp: App {
-    
-    @StateObject private var restTimerManager = RestTimerManager()
-    
     var body: some Scene {
         WindowGroup {
             ContentView()
                 .environmentObject(restTimerManager)
         }
-        .modelContainer(for: Workout.self)
+        .modelContainer(for: Exercise.self)
     }
 }
