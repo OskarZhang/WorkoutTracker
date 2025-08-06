@@ -55,6 +55,7 @@ struct ExercisesListView: View {
     @State private var showErrorAlert: Bool = false
     @State private var errorMessage: String = ""
 
+    let addWorkoutImpact = UIImpactFeedbackGenerator(style: .medium)
     // health data
     @State var authenticated = false
     @State var trigger = false
@@ -128,7 +129,10 @@ struct ExercisesListView: View {
                     Spacer()
                     HStack {
                         Spacer()
-                        Button(action: { isAddingWorkout = true }) {
+                        Button(action: {
+                            isAddingWorkout = true
+                            addWorkoutImpact.impactOccurred()
+                        }) {
                             Image(systemName: "plus")
                                 .font(.title)
                                 .frame(width: 60, height: 60)

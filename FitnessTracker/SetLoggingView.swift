@@ -32,20 +32,21 @@ struct SetLoggingView: View {
         }
     }
 
-    let impactMed = UIImpactFeedbackGenerator(style: .light)
+    let lightImpact = UIImpactFeedbackGenerator(style: .light)
+    let confirmationImpact = UIImpactFeedbackGenerator(style: .heavy)
+    @Environment(\.colorScheme) var colorScheme
 
 
     @Binding var isPresented: Bool
-    @State private var currentFocusIndexStateVar: FocusIndex? = nil
+    @State private var currentFocusIndexState: FocusIndex? = .initial
     @State private var hasEdited: [FocusIndex : Bool] = [:]
     @State private var valueMatrix: [[String]]
 
-//    @FocusState private var currentFocusIndex: FocusIndex?
     @State var weight: Int = 0
     @State var reps: Int = 0
     let exerciseName: String
     let onSave: ([StrengthSet]) -> Void
-    @State var showingNumberPad: Bool = false
+    @State var showingNumberPad: Bool = true
 
     @State private var sets: [StrengthSet] = [StrengthSet(weightInLbs: 0, reps: 0)]
 
@@ -64,57 +65,55 @@ struct SetLoggingView: View {
     var body: some View {
         NavigationView {
             VStack() {
-                addSetView()
+                ZStack {
+                    addSetView()
+                    VStack {
+                        Spacer()
+                        timerButton
+                    }
+
+                }
+
 
                 if showingNumberPad {
                     VStack(spacing: 16) {
                         Divider()
-                        numberPad(currentFocusIndexStateVar?.type ?? .weight)
+                        numberPad(currentFocusIndexState?.type ?? .weight)
                     }
                     .transition(.move(edge: .bottom))
                 }
 
             }
-
-//                .toolbar {
-//                    ToolbarItemGroup(placement: .keyboard) {
-//                        Spacer()
-//
-//                        Button("Next") {
-//
-//                            let nextFocus = currentFocusIndexStateVar?.next()
-//                            currentFocusIndexStateVar = nextFocus
-//                            if let currentFocusIndexStateVar,
-//                               currentFocusIndexStateVar.setNum + 1 > sets.count
-//                            {
-//                                addSet()
-//                            }
-//                        }
-//                    }
-//            }
-//                .onChange(of: currentFocusIndexStateVar) { newValue in
-//                    currentFocusIndex = newValue
-//                }
-//                .onChange(of: currentFocusIndex, { oldValue, newValue in
-//                    guard let currentFocusIndex else {
-//                        return
-//                    }
-//                    if currentFocusIndex.type == .rep {
-//                        valueMatrix[currentFocusIndex.setNum][1] = ""
-//                    } else {
-//                        valueMatrix[currentFocusIndex.setNum][0] = ""
-//                    }
-//                })
-
         }
         .navigationBarItems(
             trailing: Button("Done") {
+                confirmationImpact.impactOccurred()
                 onSave(sets)
                 isPresented = false
             }
         )
     }
 
+    @ViewBuilder
+    private var timerButton: some View {
+        HStack(alignment: .bottom) {
+            Spacer()
+            Button(action: {}, label: {
+                VStack(alignment: .center) {
+                    Image(systemName: "gauge.with.needle")
+                    Text("rest timer")
+                }
+                .frame(width: 100, height: 100)
+                .background(colorScheme == .dark ? Color.white : Color.black)
+                .foregroundColor(colorScheme == .dark ? Color.black : Color.white)
+                .clipShape(Circle())
+                .shadow(radius: 4)
+
+            })
+
+        }
+
+    }
 
     @ViewBuilder
     func addSetView() -> some View {
@@ -151,19 +150,36 @@ struct SetLoggingView: View {
     private func numberPadField(_ index: Int, _ type: FocusIndex.RecordType) -> some View {
         HStack {
             Text("\(type == .weight ? Int(sets[index].weightInLbs) : sets[index].reps)")
-                .foregroundStyle(currentFocusIndexStateVar == FocusIndex(setNum: index, type: type) ? .primary : .secondary)
+                .foregroundStyle(.primary)
+
+                .fontWeight(.semibold)
+                .padding(.top, 8)
+                .padding(.bottom, 8)
+                .padding(.leading, 8)
             Text(type.label)
+                .padding(.trailing, 8)
+                .padding(.top, 8)
+                .padding(.bottom, 8)
         }
         .onTapGesture {
+            lightImpact.impactOccurred()
+
             withAnimation {
-                if showingNumberPad && currentFocusIndexStateVar == FocusIndex(setNum: index, type: type) {
+                if showingNumberPad && currentFocusIndexState == FocusIndex(setNum: index, type: type) {
                     // only disappear keyboard in this instance
                     showingNumberPad = false
-                    currentFocusIndexStateVar = nil
+                    currentFocusIndexState = nil
                 } else {
                     showingNumberPad = true
-                    currentFocusIndexStateVar = FocusIndex(setNum: index, type: type)
+                    currentFocusIndexState = FocusIndex(setNum: index, type: type)
                 }
+            }
+        }
+        .background {
+            if currentFocusIndexState == FocusIndex(setNum: index, type: type) {
+                RoundedRectangle(cornerRadius: 8, style: .circular)
+                    .foregroundStyle(.secondary.opacity(0.1))
+                    .transition(.opacity)
             }
         }
         .frame(width: 100)
@@ -213,7 +229,7 @@ struct SetLoggingView: View {
     }
 
     private func updateCurrentFocusedField(numberTapped: Int) {
-        guard let currentFocusIndexState = currentFocusIndexStateVar else {
+        guard let currentFocusIndexState = currentFocusIndexState else {
             return
         }
         if currentFocusIndexState.type == .rep {
@@ -224,7 +240,7 @@ struct SetLoggingView: View {
     }
 
     private func quickAddWeight(weightAddition: Int) {
-        guard let currentFocusIndexState = currentFocusIndexStateVar else {
+        guard let currentFocusIndexState = currentFocusIndexState else {
             return
         }
         guard currentFocusIndexState.type == .weight else {
@@ -236,7 +252,7 @@ struct SetLoggingView: View {
     }
 
     private func quickSetReps(reps: Int) {
-        guard let currentFocusIndexState = currentFocusIndexStateVar else {
+        guard let currentFocusIndexState = currentFocusIndexState else {
             return
         }
         guard currentFocusIndexState.type == .rep else {
@@ -248,7 +264,7 @@ struct SetLoggingView: View {
     }
 
     private func backspaceTapped() {
-        guard let currentFocusIndexState = currentFocusIndexStateVar else {
+        guard let currentFocusIndexState = currentFocusIndexState else {
             return
         }
         if currentFocusIndexState.type == .rep {
@@ -259,10 +275,13 @@ struct SetLoggingView: View {
     }
 
     private func nextButtonTapped() {
-        let nextFocus = currentFocusIndexStateVar?.next()
-        currentFocusIndexStateVar = nextFocus
-        if let currentFocusIndexStateVar,
-           currentFocusIndexStateVar.setNum + 1 > sets.count
+        let nextFocus = currentFocusIndexState?.next()
+        withAnimation {
+            currentFocusIndexState = nextFocus
+        }
+
+        if let currentFocusIndexState,
+           currentFocusIndexState.setNum + 1 > sets.count
         {
             addSet()
         }
@@ -271,7 +290,7 @@ struct SetLoggingView: View {
     @ViewBuilder
     private func quickAddWeightButton(_ weight: Int) -> some View {
         Button {
-            impactMed.impactOccurred()
+            lightImpact.impactOccurred()
             quickAddWeight(weightAddition: weight)
         } label: {
             Text("+\(weight) lb")
@@ -290,7 +309,7 @@ struct SetLoggingView: View {
     @ViewBuilder
     private func quickSetReps(_ reps: Int) -> some View {
         Button {
-            impactMed.impactOccurred()
+            lightImpact.impactOccurred()
             quickSetReps(reps: reps)
         } label: {
             Text("\(reps) reps")
@@ -309,7 +328,7 @@ struct SetLoggingView: View {
     @ViewBuilder
     private func numberButton(_ number: Int) -> some View {
         Button {
-            impactMed.impactOccurred()
+            lightImpact.impactOccurred()
             updateCurrentFocusedField(numberTapped: number)
         } label: {
             Text("\(number)")
@@ -328,7 +347,7 @@ struct SetLoggingView: View {
     @ViewBuilder
     private var nextButton: some View {
         Button {
-            impactMed.impactOccurred()
+            lightImpact.impactOccurred()
             nextButtonTapped()
         } label: {
             Text("Next")
@@ -348,7 +367,7 @@ struct SetLoggingView: View {
     @ViewBuilder
     private var backspaceButton: some View {
         Button {
-            impactMed.impactOccurred()
+            lightImpact.impactOccurred()
             backspaceTapped()
         } label: {
             Image(systemName: "delete.backward")

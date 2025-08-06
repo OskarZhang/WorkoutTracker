@@ -14,6 +14,7 @@ struct ExercisePickerView: View {
     @StateObject private var searchContext = SearchContext()
     @State private var allExercises: [String] = []
 
+    let confirmationImpact = UIImpactFeedbackGenerator(style: .medium)
 
 
     var filteredExercises: [String] {
@@ -26,10 +27,14 @@ struct ExercisePickerView: View {
 
     var body: some View {
         VStack {
+
             TextField("Enter exercise", text: $searchContext.searchText)
                 .textFieldStyle(.plain)
                 .listRowSeparator(.hidden)
                 .autocorrectionDisabled(true)
+                .font(.system(size: 28))
+                .fontWeight(.medium)
+
                 .padding()
                 .focused($isNameFocused)
                 .introspect(.textField, on: .iOS(.v13, .v14, .v15, .v16, .v17, .v18), customize: { textField in
@@ -39,16 +44,25 @@ struct ExercisePickerView: View {
                     }
                 })
                 .onSubmit {
+                    if searchContext.searchText.isEmpty {
+                        isNameFocused = true
+                        return
+                    }
                     selectedExercise = searchContext.searchText
+                    confirmationImpact.impactOccurred()
                 }
+                .padding(.top, 8)
 
             Divider()
             List(viewModel.matchExercise(name: searchContext.searchText), id: \.self) { exercise in
                 Button(action: {
                     selectedExercise = exercise.name
+                    confirmationImpact.impactOccurred()
                 }) {
                     Text(exercise.name)
+                        .font(.system(size: 18))
                 }
+
             }
             .listStyle(.plain)
         }
@@ -56,9 +70,6 @@ struct ExercisePickerView: View {
             isNameFocused = true
 
         }
-        .navigationBarItems(trailing: Button("Next") {
-            selectedExercise = searchContext.searchText
-        })
     }
 
 }
