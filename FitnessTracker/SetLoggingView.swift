@@ -180,6 +180,7 @@ struct SetLoggingView: View {
     private func stopTimer() {
         timerIsActive = false
         timer?.invalidate()
+        timerRemaining = 120
         timer = nil
     }
     
