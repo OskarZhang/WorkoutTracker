@@ -38,9 +38,15 @@ struct SetLoggingView: View {
 
 
     @Binding var isPresented: Bool
-    @State private var currentFocusIndexState: FocusIndex? = .initial
+
+    @State private var shouldOverwrite = true
+    @State private var currentFocusIndexState: FocusIndex? = .initial {
+        didSet {
+            shouldOverwrite = true
+        }
+    }
     @State private var hasEdited: [FocusIndex : Bool] = [:]
-    @State private var valueMatrix: [[String]]
+
 
     @State var weight: Int = 0
     @State var reps: Int = 0
@@ -62,7 +68,6 @@ struct SetLoggingView: View {
         self.sets = lastSet
         self.exerciseName = exerciseName
         self.onSave = onSave
-        self.valueMatrix = lastSet.map { _ in ["", ""] }
     }
 
     var body: some View {
@@ -225,14 +230,22 @@ struct SetLoggingView: View {
     private func numberPadField(_ index: Int, _ type: FocusIndex.RecordType) -> some View {
         HStack {
             Text("\(type == .weight ? Int(sets[index].weightInLbs) : sets[index].reps)")
-                .foregroundStyle(.primary)
-
+                .foregroundStyle(shouldOverwrite && currentFocusIndexState == FocusIndex(setNum: index, type: type) ? .white : .primary)
                 .fontWeight(.semibold)
                 .padding(.top, 8)
                 .padding(.bottom, 8)
-                .padding(.leading, 8)
+                .padding(.leading, 4)
+                .padding(.trailing, 4)
+                .background {
+                    if shouldOverwrite && currentFocusIndexState == FocusIndex(setNum: index, type: type){
+                        RoundedRectangle(cornerRadius: 8, style: .circular)
+                            .foregroundStyle(colorScheme == .dark ? .white : .black)
+                            .transition(.opacity)
+                    }
+                }
             Text(type.label)
-                .padding(.trailing, 8)
+                .padding(.leading, 4)
+                .padding(.trailing, 4)
                 .padding(.top, 8)
                 .padding(.bottom, 8)
         }
@@ -259,6 +272,8 @@ struct SetLoggingView: View {
         }
         .frame(width: 100)
     }
+
+
     @ViewBuilder
     private func numberPad(_ type: FocusIndex.RecordType) -> some View {
         VStack {
@@ -309,10 +324,26 @@ struct SetLoggingView: View {
         guard let currentFocusIndexState = currentFocusIndexState else {
             return
         }
-        if currentFocusIndexState.type == .rep {
+
+        switch (shouldOverwrite, currentFocusIndexState.type) {
+        case (false, .rep):
             sets[currentFocusIndexState.setNum].reps = sets[currentFocusIndexState.setNum].reps * 10 + numberTapped
-        } else {
+        case (false, .weight):
             sets[currentFocusIndexState.setNum].weightInLbs = sets[currentFocusIndexState.setNum].weightInLbs * 10 + Double(numberTapped)
+        case (true, .rep):
+            sets[currentFocusIndexState.setNum].reps = numberTapped
+        case (true, .weight):
+            sets[currentFocusIndexState.setNum].weightInLbs = Double(numberTapped)
+        }
+
+//
+//        if currentFocusIndexState.type == .rep {
+//            sets[currentFocusIndexState.setNum].reps = sets[currentFocusIndexState.setNum].reps * 10 + numberTapped
+//        } else {
+//            sets[currentFocusIndexState.setNum].weightInLbs = sets[currentFocusIndexState.setNum].weightInLbs * 10 + Double(numberTapped)
+//        }
+        if shouldOverwrite {
+            shouldOverwrite = false
         }
     }
 
@@ -371,14 +402,8 @@ struct SetLoggingView: View {
             quickAddWeight(weightAddition: weight)
         } label: {
             Text("+\(weight) lb")
-                .font(.system(size: 24, weight: .medium))
-                .frame(maxWidth: .infinity)
-                .frame(height: 40)
-                .background(
-                    RoundedRectangle(cornerRadius: 8, style: .continuous)
-                        .fill(Color(.systemGray5))
-                )
-                .foregroundColor(.primary)
+                .font(.system(size: 24, weight: .regular))
+                .styledNumberPadText(height: 40)
         }
         .buttonStyle(PlainButtonStyle())
     }
@@ -390,14 +415,8 @@ struct SetLoggingView: View {
             quickSetReps(reps: reps)
         } label: {
             Text("\(reps) reps")
-                .font(.system(size: 24, weight: .medium))
-                .frame(maxWidth: .infinity)
-                .frame(height: 40)
-                .background(
-                    RoundedRectangle(cornerRadius: 8, style: .continuous)
-                        .fill(Color(.systemGray5))
-                )
-                .foregroundColor(.primary)
+                .font(.system(size: 24, weight: .regular))
+                .styledNumberPadText(height: 40)
         }
         .buttonStyle(PlainButtonStyle())
     }
@@ -409,14 +428,8 @@ struct SetLoggingView: View {
             updateCurrentFocusedField(numberTapped: number)
         } label: {
             Text("\(number)")
-                .font(.system(size: 36, weight: .medium))
-                .frame(maxWidth: .infinity)
-                .frame(height: 60)
-                .background(
-                    RoundedRectangle(cornerRadius: 8, style: .continuous)
-                        .fill(Color(.systemGray5))
-                )
-                .foregroundColor(.primary)
+                .font(.system(size: 36, weight: .regular))
+                .styledNumberPadText(height: 60)
         }
         .buttonStyle(PlainButtonStyle())
     }
@@ -429,13 +442,7 @@ struct SetLoggingView: View {
         } label: {
             Text("Next")
                 .font(.system(size: 30, weight: .medium))
-                .frame(maxWidth: .infinity)
-                .frame(height: 60)
-                .background(
-                    RoundedRectangle(cornerRadius: 8, style: .continuous)
-                        .fill(Color(.systemGray5))
-                )
-                .foregroundColor(.primary)
+                .styledNumberPadText(height: 60)
 
         }
         .buttonStyle(PlainButtonStyle())
@@ -448,15 +455,8 @@ struct SetLoggingView: View {
             backspaceTapped()
         } label: {
             Image(systemName: "delete.backward")
-                .font(.system(size: 30, weight: .medium))
-                .frame(maxWidth: .infinity)
-                .frame(height: 60)
-                .background(
-                    RoundedRectangle(cornerRadius: 12, style: .continuous)
-                        .fill(Color(.systemGray5))
-                )
-                .foregroundColor(.primary)
-
+                .font(.system(size: 30, weight: .regular))
+                .styledNumberPadText(height: 60)
         }
         .buttonStyle(PlainButtonStyle())
     }
@@ -464,11 +464,22 @@ struct SetLoggingView: View {
 
     private func addSet() {
         sets.append(StrengthSet(weightInLbs: 0, reps: 0))
-        valueMatrix.append(["", ""])
     }
 
     private func deleteSet(at offsets: IndexSet) {
         sets.remove(atOffsets: offsets)
-        valueMatrix.remove(atOffsets: offsets)
+    }
+}
+
+extension View {
+    func styledNumberPadText(height: CGFloat) -> some View {
+        return self
+            .frame(maxWidth: .infinity)
+            .frame(height: height)
+            .background(
+                RoundedRectangle(cornerRadius: 8, style: .continuous)
+                    .fill(Color(.systemGray5))
+            )
+            .foregroundColor(.primary)
     }
 }
