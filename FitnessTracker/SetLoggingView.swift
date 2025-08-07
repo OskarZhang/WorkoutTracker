@@ -47,6 +47,9 @@ struct SetLoggingView: View {
     let exerciseName: String
     let onSave: ([StrengthSet]) -> Void
     @State var showingNumberPad: Bool = true
+    @State private var timerRemaining: TimeInterval = 120
+    @State private var timerIsActive: Bool = false
+    @State private var timer: Timer?
 
     @State private var sets: [StrengthSet] = [StrengthSet(weightInLbs: 0, reps: 0)]
 
@@ -69,11 +72,17 @@ struct SetLoggingView: View {
                     addSetView()
                     VStack {
                         Spacer()
-                        timerButton
+                        if shouldShowTimerButton {
+                            timerButton
+                                .padding(.trailing, 8)
+                                .padding(.bottom, 8)
+                                .transition(.asymmetric(
+                                    insertion: .move(edge: .bottom),
+                                    removal: .opacity
+                                ))
+                        }
                     }
-
                 }
-
 
                 if showingNumberPad {
                     VStack(spacing: 16) {
@@ -92,27 +101,92 @@ struct SetLoggingView: View {
                 isPresented = false
             }
         )
+        .onDisappear {
+            stopTimer()
+        }
+    }
+
+    private var shouldShowTimerButton: Bool {
+        return currentFocusIndexState?.type == .rep
+    }
+    
+    private var timerDisplayText: String {
+        let minutes = Int(timerRemaining) / 60
+        let seconds = Int(timerRemaining) % 60
+        return String(format: "%d:%02d", minutes, seconds)
     }
 
     @ViewBuilder
     private var timerButton: some View {
         HStack(alignment: .bottom) {
             Spacer()
-            Button(action: {}, label: {
-                VStack(alignment: .center) {
-                    Image(systemName: "gauge.with.needle")
-                    Text("rest timer")
+            Button(action: startRestTimer) {
+                ZStack {
+                    Circle()
+                        .fill(colorScheme == .dark ? Color.white : Color.black)
+                        .frame(width: 70, height: 70)
+
+                    if timerIsActive {
+                        Circle()
+                            .stroke(Color.gray.opacity(0.3), lineWidth: 6)
+                            .frame(width: 64, height: 64)
+
+                        Circle()
+                            .trim(from: 0, to: CGFloat(1 - (timerRemaining / 120)))
+                            .stroke(Color.orange, style: StrokeStyle(lineWidth: 6, lineCap: .round))
+                            .frame(width: 64, height: 64)
+                            .rotationEffect(.degrees(-90))
+                            .animation(.linear(duration: 1), value: timerRemaining)
+                    }
+                    VStack {
+                        Text(timerIsActive ? timerDisplayText : "2:00")
+                            .font(.system(size: 18, weight: .medium))
+                            .monospacedDigit()
+                            .foregroundColor(colorScheme == .dark ? Color.black : Color.white)
+                            .multilineTextAlignment(.center)
+                            .lineLimit(2)
+                        if !timerIsActive {
+                            Text("Start")
+                                .font(.system(size: 14, weight: .medium))
+                                .foregroundColor(colorScheme == .dark ? Color.black : Color.white)
+                                .multilineTextAlignment(.center)
+                                .lineLimit(2)
+                        }
+                    }
                 }
-                .frame(width: 100, height: 100)
-                .background(colorScheme == .dark ? Color.white : Color.black)
-                .foregroundColor(colorScheme == .dark ? Color.black : Color.white)
-                .clipShape(Circle())
                 .shadow(radius: 4)
-
-            })
-
+                .animation(.easeInOut(duration: 0.2), value: timerIsActive)
+            }
         }
-
+    }
+    
+    private func startRestTimer() {
+        lightImpact.impactOccurred()
+        
+        if timerIsActive {
+            stopTimer()
+        } else {
+            timerIsActive = true
+            timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { _ in
+                if timerRemaining > 0 {
+                    timerRemaining -= 1
+                } else {
+                    timerFinished()
+                }
+            }
+        }
+    }
+    
+    private func stopTimer() {
+        timerIsActive = false
+        timer?.invalidate()
+        timer = nil
+    }
+    
+    private func timerFinished() {
+        stopTimer()
+        timerRemaining = 120
+        confirmationImpact.impactOccurred()
     }
 
     @ViewBuilder
@@ -225,6 +299,8 @@ struct SetLoggingView: View {
         }
         .padding(.leading, 8)
         .padding(.trailing, 8)
+        .background(colorScheme == .dark ? Color.black : Color.white)
+
 
     }
 
