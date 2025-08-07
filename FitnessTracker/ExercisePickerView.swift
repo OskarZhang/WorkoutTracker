@@ -53,7 +53,6 @@ struct ExercisePickerView: View {
                 }
                 .padding(.top, 8)
 
-            Divider()
             List(viewModel.matchExercise(name: searchContext.searchText), id: \.self) { exercise in
                 Button(action: {
                     selectedExercise = exercise.name

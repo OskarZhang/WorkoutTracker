@@ -90,10 +90,10 @@ struct SetLoggingView: View {
                 }
 
                 if showingNumberPad {
-                    VStack(spacing: 16) {
-                        Divider()
+//                    VStack(spacing: 16) {
+
                         numberPad(currentFocusIndexState?.type ?? .weight)
-                    }
+//                    }
                     .transition(.move(edge: .bottom))
                 }
 
@@ -284,6 +284,7 @@ struct SetLoggingView: View {
     @ViewBuilder
     private func numberPad(_ type: FocusIndex.RecordType) -> some View {
         VStack {
+            Divider()
             HStack {
                 if type == .weight {
                     quickAddWeightButton(5)
@@ -322,7 +323,7 @@ struct SetLoggingView: View {
         }
         .padding(.leading, 8)
         .padding(.trailing, 8)
-        .background(colorScheme == .dark ? Color.black : Color.white)
+        .background(colorScheme == .dark ? Color.black : Color(.systemGray5))
 
 
     }
@@ -404,7 +405,7 @@ struct SetLoggingView: View {
         } label: {
             Text("+\(weight) lb")
                 .font(.system(size: 24, weight: .medium))
-                .styledNumberPadText(height: 40)
+                .styledNumberPadText(height: 40, colorScheme: colorScheme)
         }
         .buttonStyle(PlainButtonStyle())
     }
@@ -417,7 +418,7 @@ struct SetLoggingView: View {
         } label: {
             Text("\(reps) reps")
                 .font(.system(size: 24, weight: .medium))
-                .styledNumberPadText(height: 40)
+                .styledNumberPadText(height: 40, colorScheme: colorScheme)
         }
         .buttonStyle(PlainButtonStyle())
     }
@@ -430,7 +431,7 @@ struct SetLoggingView: View {
         } label: {
             Text("\(number)")
                 .font(.system(size: 36, weight: .regular))
-                .styledNumberPadText(height: 60)
+                .styledNumberPadText(height: 60, colorScheme: colorScheme)
         }
         .buttonStyle(PlainButtonStyle())
     }
@@ -443,7 +444,7 @@ struct SetLoggingView: View {
         } label: {
             Text("Next")
                 .font(.system(size: 30, weight: .medium))
-                .styledNumberPadText(height: 60)
+                .styledNumberPadText(height: 60, colorScheme: colorScheme)
 
         }
         .buttonStyle(PlainButtonStyle())
@@ -457,7 +458,7 @@ struct SetLoggingView: View {
         } label: {
             Image(systemName: "delete.backward")
                 .font(.system(size: 30, weight: .regular))
-                .styledNumberPadText(height: 60)
+                .styledNumberPadText(height: 60, colorScheme: colorScheme)
         }
         .buttonStyle(PlainButtonStyle())
     }
@@ -478,13 +479,14 @@ struct SetLoggingView: View {
 }
 
 extension View {
-    func styledNumberPadText(height: CGFloat) -> some View {
+    func styledNumberPadText(height: CGFloat, colorScheme: ColorScheme) -> some View {
         return self
             .frame(maxWidth: .infinity)
             .frame(height: height)
             .background(
                 RoundedRectangle(cornerRadius: 8, style: .continuous)
-                    .fill(Color(.systemGray5))
+                    .fill(colorScheme == .dark ? Color(.systemGray2) : Color(.white))
+                    .shadow(radius: 0.4)
             )
             .foregroundColor(.primary)
     }
