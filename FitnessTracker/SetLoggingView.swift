@@ -5,12 +5,12 @@ struct SetLoggingView: View {
     private struct FocusIndex: Equatable, Hashable {
         enum RecordType {
             case weight, rep
-            var label: String {
+            func labelForValue(_ value: Int) -> String {
                 switch self {
                 case .weight:
                     return "lb"
                 case .rep:
-                    return "rep"
+                    return value > 1 ? "reps" : "rep"
                 }
             }
         }
@@ -145,14 +145,14 @@ struct SetLoggingView: View {
                     }
                     VStack {
                         Text(timerIsActive ? timerDisplayText : "2:00")
-                            .font(.system(size: 18, weight: .medium))
+                            .font(.system(size: 18, weight: .semibold))
                             .monospacedDigit()
                             .foregroundColor(colorScheme == .dark ? Color.black : Color.white)
                             .multilineTextAlignment(.center)
                             .lineLimit(2)
                         if !timerIsActive {
                             Text("Start")
-                                .font(.system(size: 14, weight: .medium))
+                                .font(.system(size: 12, weight: .light))
                                 .foregroundColor(colorScheme == .dark ? Color.black : Color.white)
                                 .multilineTextAlignment(.center)
                                 .lineLimit(2)
@@ -212,12 +212,14 @@ struct SetLoggingView: View {
                         numberPadField(index, .weight)
                         numberPadField(index, .rep)
                     }
+                    .listRowSeparator(.hidden)
                 }
                 .onDelete(perform: deleteSet)
 
                 Button(action: addSet) {
                     Label("Add Set", systemImage: "plus.circle.fill")
                 }
+                .listRowSeparator(.hidden)
             }
 
             .listStyle(.plain)
@@ -229,25 +231,37 @@ struct SetLoggingView: View {
     @ViewBuilder
     private func numberPadField(_ index: Int, _ type: FocusIndex.RecordType) -> some View {
         HStack {
-            Text("\(type == .weight ? Int(sets[index].weightInLbs) : sets[index].reps)")
-                .foregroundStyle(shouldOverwrite && currentFocusIndexState == FocusIndex(setNum: index, type: type) ? .white : .primary)
-                .fontWeight(.semibold)
-                .padding(.top, 8)
-                .padding(.bottom, 8)
-                .padding(.leading, 4)
-                .padding(.trailing, 4)
+            Spacer()
+            HStack {
+                Text("\(type == .weight ? Int(sets[index].weightInLbs) : sets[index].reps)")
+                    .lineLimit(1)
+                    .foregroundStyle(shouldOverwrite && currentFocusIndexState == FocusIndex(setNum: index, type: type) ? (colorScheme == .dark ? .black : .white) : .primary)
+                    .fontWeight(.semibold)
+                    .padding(.top, 8)
+                    .padding(.bottom, 8)
+                    .padding(.leading, 4)
+                    .padding(.trailing, 4)
+                    .background {
+                        if shouldOverwrite && currentFocusIndexState == FocusIndex(setNum: index, type: type){
+                            RoundedRectangle(cornerRadius: 8, style: .circular)
+                                .foregroundStyle(colorScheme == .dark ? .white : .black)
+                                .transition(.opacity)
+                        }
+                    }
+                Text(type.labelForValue(type == .weight ? Int(sets[index].weightInLbs) : sets[index].reps))
+                    .padding(.leading, 4)
+                    .padding(.trailing, 4)
+                    .padding(.top, 8)
+                    .padding(.bottom, 8)
+            }
                 .background {
-                    if shouldOverwrite && currentFocusIndexState == FocusIndex(setNum: index, type: type){
+                    if currentFocusIndexState == FocusIndex(setNum: index, type: type) {
                         RoundedRectangle(cornerRadius: 8, style: .circular)
-                            .foregroundStyle(colorScheme == .dark ? .white : .black)
+                            .foregroundStyle(.secondary.opacity(0.1))
                             .transition(.opacity)
                     }
                 }
-            Text(type.label)
-                .padding(.leading, 4)
-                .padding(.trailing, 4)
-                .padding(.top, 8)
-                .padding(.bottom, 8)
+
         }
         .onTapGesture {
             lightImpact.impactOccurred()
@@ -261,13 +275,6 @@ struct SetLoggingView: View {
                     showingNumberPad = true
                     currentFocusIndexState = FocusIndex(setNum: index, type: type)
                 }
-            }
-        }
-        .background {
-            if currentFocusIndexState == FocusIndex(setNum: index, type: type) {
-                RoundedRectangle(cornerRadius: 8, style: .circular)
-                    .foregroundStyle(.secondary.opacity(0.1))
-                    .transition(.opacity)
             }
         }
         .frame(width: 100)
@@ -336,12 +343,6 @@ struct SetLoggingView: View {
             sets[currentFocusIndexState.setNum].weightInLbs = Double(numberTapped)
         }
 
-//
-//        if currentFocusIndexState.type == .rep {
-//            sets[currentFocusIndexState.setNum].reps = sets[currentFocusIndexState.setNum].reps * 10 + numberTapped
-//        } else {
-//            sets[currentFocusIndexState.setNum].weightInLbs = sets[currentFocusIndexState.setNum].weightInLbs * 10 + Double(numberTapped)
-//        }
         if shouldOverwrite {
             shouldOverwrite = false
         }
@@ -402,7 +403,7 @@ struct SetLoggingView: View {
             quickAddWeight(weightAddition: weight)
         } label: {
             Text("+\(weight) lb")
-                .font(.system(size: 24, weight: .regular))
+                .font(.system(size: 24, weight: .medium))
                 .styledNumberPadText(height: 40)
         }
         .buttonStyle(PlainButtonStyle())
@@ -415,7 +416,7 @@ struct SetLoggingView: View {
             quickSetReps(reps: reps)
         } label: {
             Text("\(reps) reps")
-                .font(.system(size: 24, weight: .regular))
+                .font(.system(size: 24, weight: .medium))
                 .styledNumberPadText(height: 40)
         }
         .buttonStyle(PlainButtonStyle())
@@ -463,11 +464,16 @@ struct SetLoggingView: View {
 
 
     private func addSet() {
-        sets.append(StrengthSet(weightInLbs: 0, reps: 0))
+        let lastSet = sets.last
+        withAnimation {
+            sets.append(StrengthSet(weightInLbs: lastSet?.weightInLbs ?? 0, reps: lastSet?.reps ?? 0))
+        }
     }
 
     private func deleteSet(at offsets: IndexSet) {
-        sets.remove(atOffsets: offsets)
+        withAnimation {
+            sets.remove(atOffsets: offsets)
+        }
     }
 }
 

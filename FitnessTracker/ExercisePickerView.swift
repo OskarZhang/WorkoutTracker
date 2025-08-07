@@ -62,6 +62,7 @@ struct ExercisePickerView: View {
                     Text(exercise.name)
                         .font(.system(size: 18))
                 }
+                .listRowSeparator(.hidden)
 
             }
             .listStyle(.plain)
