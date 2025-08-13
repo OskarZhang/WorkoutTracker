@@ -4,7 +4,7 @@ import Combine
 class AddWorkoutViewModel: ObservableObject {
     @Published var selectedExercise: String? {
         didSet {
-            if selectedExercise != nil {
+            if selectedExercise != nil && !hasPrefilledExercise {
                 isShowingSetLogging = true
             }
         }
@@ -12,11 +12,15 @@ class AddWorkoutViewModel: ObservableObject {
     @Published var sets: [StrengthSet] = []
 
     @Published var isShowingSetLogging = false
+    
+    let hasPrefilledExercise: Bool
 
     private let exerciseService: ExerciseService
 
-    init(exerciseService: ExerciseService) {
+    init(exerciseService: ExerciseService, prefilledExerciseName: String? = nil) {
         self.exerciseService = exerciseService
+        self.hasPrefilledExercise = prefilledExerciseName != nil
+        self.selectedExercise = prefilledExerciseName
     }
 
     func saveWorkout() {
