@@ -7,6 +7,7 @@
 # Build products and intermediate build files
 build/
 DerivedData/
+*.hmap
 
 # User-specific files and settings
 *.xcuserstate
@@ -41,7 +42,9 @@ xcuserdata/
 # Swift Package Manager (SPM)
 ############################
 .build/
-.swiftpm/xcode/
+.swiftpm/
+Packages/
+Package.pins
 # Uncomment the next line to stop tracking resolved versions.
 # Package.resolved
 
@@ -54,6 +57,7 @@ Pods/
 # Carthage #
 ############
 Carthage/Build/
+Carthage/Checkouts/
 
 ############
 # Fastlane #
@@ -68,6 +72,9 @@ fastlane/test_output/
 #############
 *.ipa
 *.xcarchive
+*.dSYM.zip
+*.dSYM
+*.xcresult
 
 #############
 # Core Data / Realm #
@@ -77,6 +84,15 @@ fastlane/test_output/
 *.sqlite-shm
 *.realm
 *.realm.lock
+
+############################
+# Coverage & Instrumentation #
+############################
+coverage/
+*.profdata
+*.profraw
+*.xccovreport
+*.xccovarchive
 
 ##############
 # Playgrounds #
@@ -97,3 +113,6 @@ Playground.playground/contents.swift
 # VSCode / Cursor
 .vscode/
 .cursor/
+
+# InjectionIII (runtime code injection)
+iOSInjectionProject/

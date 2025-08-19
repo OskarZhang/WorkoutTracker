@@ -207,6 +207,7 @@ class ExerciseService {
     func addExercise(_ exercise: Exercise) {
         modelContext.insert(exercise)
         exercises.insert(exercise, at: 0)
+        try? modelContext.save()
     }
 
     private func matchWorkout(exerciseName: String) -> [Exercise] {
