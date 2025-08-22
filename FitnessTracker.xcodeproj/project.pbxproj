@@ -30,6 +30,11 @@
 		4BB21AAE2C8813E300C1DEDE /* WorkoutDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BB21AAD2C8813E300C1DEDE /* WorkoutDetailView.swift */; };
 		4BD095A72D7E588300F4769F /* ExerciseService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BD095A62D7E588100F4769F /* ExerciseService.swift */; };
 		4BF3492F2CCEFD0C00891FAE /* SliderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BF3492E2CCEFCFD00891FAE /* SliderView.swift */; };
+		4C1000013E00000100000001 /* RoutineModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C0000013E00000100000001 /* RoutineModels.swift */; };
+		4C1000023E00000100000001 /* RoutineService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C0000023E00000100000001 /* RoutineService.swift */; };
+		4C1000043E00000100000002 /* CurrentRoutineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C0000043E00000100000002 /* CurrentRoutineView.swift */; };
+		4C1000053E00000100000001 /* CraftRoutineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C0000053E00000100000001 /* CraftRoutineView.swift */; };
+		4C1000063E00000100000003 /* RoutineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C0000063E00000100000003 /* RoutineView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -69,6 +74,12 @@
 		4BB21AAD2C8813E300C1DEDE /* WorkoutDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutDetailView.swift; sourceTree = "<group>"; };
 		4BD095A62D7E588100F4769F /* ExerciseService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExerciseService.swift; sourceTree = "<group>"; };
 		4BF3492E2CCEFCFD00891FAE /* SliderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SliderView.swift; sourceTree = "<group>"; };
+		4C0000013E00000100000001 /* RoutineModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoutineModels.swift; sourceTree = "<group>"; };
+		4C0000023E00000100000001 /* RoutineService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoutineService.swift; sourceTree = "<group>"; };
+		4C0000033E00000100000001 /* TodayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodayView.swift; sourceTree = "<group>"; };
+		4C0000043E00000100000002 /* CurrentRoutineView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrentRoutineView.swift; sourceTree = "<group>"; };
+		4C0000053E00000100000001 /* CraftRoutineView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CraftRoutineView.swift; sourceTree = "<group>"; };
+		4C0000063E00000100000003 /* RoutineView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoutineView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -119,8 +130,13 @@
 				4BF3492E2CCEFCFD00891FAE /* SliderView.swift */,
 				4B9DF0062E4C4AE800C4BF95 /* TodayRecommendationService.swift */,
 				4B9DF0072E4C4AE800C4BF95 /* TodayView.swift */,
+				4C0000063E00000100000003 /* RoutineView.swift */,
 				4BB21AAD2C8813E300C1DEDE /* WorkoutDetailView.swift */,
 				4B31DA292CACC2F5005B3984 /* WorkoutChartView.swift */,
+				4C0000013E00000100000001 /* RoutineModels.swift */,
+				4C0000023E00000100000001 /* RoutineService.swift */,
+				4C0000053E00000100000001 /* CraftRoutineView.swift */,
+				4C0000043E00000100000002 /* CurrentRoutineView.swift */,
 				4BA93FC42C86B7B400973198 /* Assets.xcassets */,
 				4BA93FC62C86B7B400973198 /* Preview Content */,
 				4BB21AA72C86D4BC00C1DEDE /* Data.swift */,
@@ -230,6 +246,12 @@
 				4B9E49102E2F449E00C8D273 /* SetLoggingView.swift in Sources */,
 				4B31DA2A2CACC2FA005B3984 /* WorkoutChartView.swift in Sources */,
 				4BF3492F2CCEFD0C00891FAE /* SliderView.swift in Sources */,
+				4C1000013E00000100000001 /* RoutineModels.swift in Sources */,
+				4C1000023E00000100000001 /* RoutineService.swift in Sources */,
+				4C1000033E00000100000001 /* TodayView.swift in Sources */,
+				4C1000043E00000100000002 /* CurrentRoutineView.swift in Sources */,
+				4C1000053E00000100000001 /* CraftRoutineView.swift in Sources */,
+				4C1000063E00000100000003 /* RoutineView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

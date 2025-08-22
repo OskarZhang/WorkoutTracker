@@ -27,6 +27,11 @@ struct ContentView: View {
                     Image(systemName: "chart.xyaxis.line")
                     Text("Trends")
             }
+            RoutineView()
+                .tabItem {
+                    Image(systemName: "calendar")
+                    Text("Routine")
+                }
         }
         .tint(colorScheme == .dark ? Color.white : Color(UIColor.black))
     }

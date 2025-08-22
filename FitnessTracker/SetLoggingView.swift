@@ -98,14 +98,18 @@ struct SetLoggingView: View {
                 }
 
             }
-        }
-        .navigationBarItems(
-            trailing: Button("Done") {
-                confirmationImpact.impactOccurred()
-                onSave(sets)
-                isPresented = false
+            .navigationTitle(exerciseName)
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button("Done") {
+                        confirmationImpact.impactOccurred()
+                        onSave(sets)
+                        isPresented = false
+                    }
+                }
             }
-        )
+        }
         .onDisappear {
             stopTimer()
         }
@@ -199,11 +203,6 @@ struct SetLoggingView: View {
     func addSetView() -> some View {
 
         VStack(alignment: .leading) {
-            Text(exerciseName)
-                .padding()
-                .font(.largeTitle)
-                .fontWeight(.medium)
-
             List {
                 ForEach(sets.indices, id: \.self) { index in
                     HStack {

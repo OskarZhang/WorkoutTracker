@@ -36,7 +36,7 @@ class Exercise {
     var tag: ExerciseTag?
 
     // Strength-specific
-    @Relationship(deleteRule: .cascade) var sets: [StrengthSet]?
+    @Relationship(deleteRule: .cascade, inverse: \StrengthSet.exercise) var sets: [StrengthSet]?
 
     // Cardio-specific
     var distanceInMiles: Double?
@@ -72,6 +72,7 @@ class StrengthSet {
     var reps: Int
     var restSeconds: Int?
     var rpe: Int?
+    @Relationship var exercise: Exercise?
 
     init(weightInLbs: Double, reps: Int, restSeconds: Int? = nil, rpe: Int? = nil) {
         self.weightInLbs = weightInLbs
