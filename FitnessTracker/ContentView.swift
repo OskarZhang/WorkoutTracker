@@ -12,6 +12,11 @@ struct ContentView: View {
 
     var body: some View {
         TabView {
+            TodayView()
+                .tabItem {
+                    Image(systemName: "calendar.badge.clock")
+                    Text("Today")
+                }
             ExercisesListView(exerciseService: ExerciseService(modelContext: modelContext))
                 .tabItem {
                     Image(systemName: "dumbbell")
