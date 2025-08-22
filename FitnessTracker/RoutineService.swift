@@ -42,10 +42,23 @@ struct RoutineService {
 
     func reorderDays(_ routine: Routine, fromOffsets: IndexSet, toOffset: Int) {
         routine.days.sort { $0.order < $1.order }
-        routine.days.move(fromOffsets: fromOffsets, toOffset: toOffset)
+        // Clamp indices to valid bounds to avoid out-of-range
+        let count = routine.days.count
+        let safeTo = max(0, min(toOffset, count))
+        let safeFrom = IndexSet(fromOffsets.filter { $0 >= 0 && $0 < count })
+        guard !safeFrom.isEmpty else { return }
+        routine.days.move(fromOffsets: safeFrom, toOffset: safeTo)
         for (i, day) in routine.days.enumerated() {
             day.order = i
         }
+    }
+
+    func reorderExercises(in day: RoutineDay, fromOffsets: IndexSet, toOffset: Int) {
+        let count = day.exercises.count
+        let safeTo = max(0, min(toOffset, count))
+        let safeFrom = IndexSet(fromOffsets.filter { $0 >= 0 && $0 < count })
+        guard !safeFrom.isEmpty else { return }
+        day.exercises.move(fromOffsets: safeFrom, toOffset: safeTo)
     }
 
     func setActiveRoutine(_ routine: Routine) {

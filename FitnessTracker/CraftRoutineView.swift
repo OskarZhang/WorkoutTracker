@@ -23,15 +23,19 @@ struct CraftRoutineView: View {
 
                 if let routine {
                     ForEach(routine.days.sorted(by: { $0.order < $1.order })) { day in
-                        Section(header: HStack {
-                            TextField("Day name", text: Binding(
-                                get: { day.name },
-                                set: { newValue in
-                                    day.name = newValue
-                                }
-                            ))
-                            .textFieldStyle(.roundedBorder)
-                        }) {
+                        Section {
+                            HStack {
+                                TextField("Day name", text: Binding(
+                                    get: { day.name },
+                                    set: { newValue in
+                                        day.name = newValue
+                                    }
+                                ))
+                                .font(.headline)
+                                .textFieldStyle(.plain)
+                            }
+                            .listRowSeparator(.visible)
+
                             if day.exercises.isEmpty {
                                 VStack(alignment: .leading, spacing: 8) {
                                     Text("Suggested")
@@ -62,6 +66,10 @@ struct CraftRoutineView: View {
                                 .onDelete { indexSet in
                                     let service = RoutineService(modelContext: modelContext)
                                     service.removeExercise(from: day, at: indexSet)
+                                }
+                                .onMove { indexSet, to in
+                                    let service = RoutineService(modelContext: modelContext)
+                                    service.reorderExercises(in: day, fromOffsets: indexSet, toOffset: to)
                                 }
                             }
 

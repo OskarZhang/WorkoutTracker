@@ -32,9 +32,9 @@
 		4BF3492F2CCEFD0C00891FAE /* SliderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BF3492E2CCEFCFD00891FAE /* SliderView.swift */; };
 		4C1000013E00000100000001 /* RoutineModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C0000013E00000100000001 /* RoutineModels.swift */; };
 		4C1000023E00000100000001 /* RoutineService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C0000023E00000100000001 /* RoutineService.swift */; };
-		4C1000033E00000100000001 /* TodayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C0000033E00000100000001 /* TodayView.swift */; };
-		4C1000043E00000100000001 /* CurrentRoutineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C0000043E00000100000001 /* CurrentRoutineView.swift */; };
+		4C1000043E00000100000002 /* CurrentRoutineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C0000043E00000100000002 /* CurrentRoutineView.swift */; };
 		4C1000053E00000100000001 /* CraftRoutineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C0000053E00000100000001 /* CraftRoutineView.swift */; };
+		4C1000063E00000100000003 /* RoutineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C0000063E00000100000003 /* RoutineView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -77,8 +77,9 @@
 		4C0000013E00000100000001 /* RoutineModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoutineModels.swift; sourceTree = "<group>"; };
 		4C0000023E00000100000001 /* RoutineService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoutineService.swift; sourceTree = "<group>"; };
 		4C0000033E00000100000001 /* TodayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodayView.swift; sourceTree = "<group>"; };
-		4C0000043E00000100000001 /* CurrentRoutineView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrentRoutineView.swift; sourceTree = "<group>"; };
+		4C0000043E00000100000002 /* CurrentRoutineView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrentRoutineView.swift; sourceTree = "<group>"; };
 		4C0000053E00000100000001 /* CraftRoutineView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CraftRoutineView.swift; sourceTree = "<group>"; };
+		4C0000063E00000100000003 /* RoutineView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoutineView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -119,7 +120,6 @@
 				4B9F71D72CA4F81D009706C6 /* CSVExporter.swift */,
 				4BA93FC02C86B7B300973198 /* FitnessTrackerApp.swift */,
 				4B31DA252CACC0A0005B3984 /* ContentView.swift */,
-				4C0000033E00000100000001 /* TodayView.swift */,
 				4B9E490D2E2F449200C8D273 /* ExercisePickerView.swift */,
 				4B31DA272CACC176005B3984 /* TrendsView.swift */,
 				4BA93FC22C86B7B300973198 /* ExercisesListView.swift */,
@@ -130,12 +130,13 @@
 				4BF3492E2CCEFCFD00891FAE /* SliderView.swift */,
 				4B9DF0062E4C4AE800C4BF95 /* TodayRecommendationService.swift */,
 				4B9DF0072E4C4AE800C4BF95 /* TodayView.swift */,
+				4C0000063E00000100000003 /* RoutineView.swift */,
 				4BB21AAD2C8813E300C1DEDE /* WorkoutDetailView.swift */,
 				4B31DA292CACC2F5005B3984 /* WorkoutChartView.swift */,
 				4C0000013E00000100000001 /* RoutineModels.swift */,
 				4C0000023E00000100000001 /* RoutineService.swift */,
-				4C0000043E00000100000001 /* CurrentRoutineView.swift */,
 				4C0000053E00000100000001 /* CraftRoutineView.swift */,
+				4C0000043E00000100000002 /* CurrentRoutineView.swift */,
 				4BA93FC42C86B7B400973198 /* Assets.xcassets */,
 				4BA93FC62C86B7B400973198 /* Preview Content */,
 				4BB21AA72C86D4BC00C1DEDE /* Data.swift */,
@@ -248,8 +249,9 @@
 				4C1000013E00000100000001 /* RoutineModels.swift in Sources */,
 				4C1000023E00000100000001 /* RoutineService.swift in Sources */,
 				4C1000033E00000100000001 /* TodayView.swift in Sources */,
-				4C1000043E00000100000001 /* CurrentRoutineView.swift in Sources */,
+				4C1000043E00000100000002 /* CurrentRoutineView.swift in Sources */,
 				4C1000053E00000100000001 /* CraftRoutineView.swift in Sources */,
+				4C1000063E00000100000003 /* RoutineView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -205,6 +205,13 @@ class ExerciseService {
     }
 
     func addExercise(_ exercise: Exercise) {
+        // Ensure inverse relationships are set and explicitly insert children
+        if let sets = exercise.sets {
+            for set in sets {
+                set.exercise = exercise
+                modelContext.insert(set)
+            }
+        }
         modelContext.insert(exercise)
         exercises.insert(exercise, at: 0)
         try? modelContext.save()

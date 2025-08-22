@@ -33,13 +33,17 @@ struct TodayView: View {
                         isPresented: .constant(true),
                         exerciseName: exercise.name,
                         onSave: { sets in
+                            print("[Today] Saving exercise \(exercise.name) with \(sets.count) sets")
+                            // Apply tag and ensure inverse relationship is set in service
                             let newExercise = Exercise(
                                 name: exercise.name,
                                 type: .strength,
+                                tag: ExerciseService.tagForExerciseName(exercise.name),
                                 sets: sets
                             )
                             ExerciseService(modelContext: modelContext).addExercise(newExercise)
                             selectedExercise = nil
+                            print("[Today] Saved exercise")
                         }
                     )
                 }
@@ -162,8 +166,4 @@ struct RecommendationCard: View {
             return "Done \(days) days ago"
         }
     }
-}
-
-#Preview {
-    TodayView()
 }
