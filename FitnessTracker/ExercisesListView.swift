@@ -27,9 +27,20 @@ struct ExercisesListView: View {
 
     var groupedWorkouts: [(date: Date, exercises: [Exercise])] {
         let startTime = Date().timeIntervalSince1970
-        let groupedDict = Dictionary(grouping: exercises.filter({ exercise in
-            searchContext.debouncedSearchText.isEmpty || exercise.name.lowercased().contains(searchContext.debouncedSearchText.lowercased())
-        })) { exercise in
+
+        let filtered: [Exercise]
+        if searchContext.debouncedSearchText.isEmpty {
+            filtered = exercises
+        } else {
+            let uniqueNames = Array(Set(exercises.map { $0.name }))
+            // Include aliases as candidates, then resolve to canonical names
+            let candidates = uniqueNames + exerciseService.aliasCandidates()
+            let matches = Fuzzy.sort(query: searchContext.debouncedSearchText, candidates: candidates, minScore: 0.55)
+            let allowedCanonicals = Set(matches.map { exerciseService.resolveCanonicalName($0.name) })
+            filtered = exercises.filter { allowedCanonicals.contains($0.name) }
+        }
+
+        let groupedDict = Dictionary(grouping: filtered) { exercise in
             // Normalize the date to remove time components
             Calendar.current.startOfDay(for: exercise.date)
         }

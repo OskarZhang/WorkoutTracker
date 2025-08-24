@@ -54,8 +54,9 @@ class ExerciseService {
             var mapping: [String: ExerciseTag] = [:]
             if header.contains(",") {
                 for row in lines {
-                    let parts = row.split(separator: ",", maxSplits: 1).map { String($0).trimmingCharacters(in: .whitespaces) }
-                    guard parts.count == 2 else { continue }
+                    // Allow optional 3rd column (Aliases)
+                    let parts = row.split(separator: ",", maxSplits: 2).map { String($0).trimmingCharacters(in: .whitespaces) }
+                    guard parts.count >= 2 else { continue }
                     let name = parts[0]
                     let tag = ExerciseTag(rawValue: parts[1]) ?? ExerciseService.tagForExerciseName(name)
                     mapping[name] = tag
@@ -66,6 +67,50 @@ class ExerciseService {
             return [:]
         }
     }()
+
+    // Maps normalized alias -> canonical name (as written in CSV Name column)
+    lazy var aliasNormalizedToCanonicalFromCSV: [String: String] = {
+        guard let url = Bundle.main.url(forResource: "strength_workout_names", withExtension: "csv") else {
+            return [:]
+        }
+        do {
+            let content = try String(contentsOf: url)
+            var lines = content.components(separatedBy: .newlines)
+                .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
+                .filter { !$0.isEmpty }
+            guard !lines.isEmpty else { return [:] }
+            let header = lines.removeFirst().lowercased()
+            var mapping: [String: String] = [:]
+            if header.contains(",") {
+                for row in lines {
+                    let parts = row.split(separator: ",", maxSplits: 2).map { String($0).trimmingCharacters(in: .whitespaces) }
+                    guard !parts.isEmpty else { continue }
+                    let canonical = parts[0]
+                    if parts.count >= 3 {
+                        let aliasField = parts[2]
+                        if !aliasField.isEmpty {
+                            let aliases = aliasField.split(separator: ";").map { String($0).trimmingCharacters(in: .whitespacesAndNewlines) }.filter { !$0.isEmpty }
+                            for alias in aliases {
+                                mapping[Fuzzy.normalize(alias)] = canonical
+                            }
+                        }
+                    }
+                }
+            }
+            return mapping
+        } catch {
+            return [:]
+        }
+    }()
+
+    func aliasCandidates() -> [String] {
+        return Array(aliasNormalizedToCanonicalFromCSV.keys)
+    }
+
+    func resolveCanonicalName(_ nameOrAlias: String) -> String {
+        let norm = Fuzzy.normalize(nameOrAlias)
+        return aliasNormalizedToCanonicalFromCSV[norm] ?? nameOrAlias
+    }
 
     init(modelContext: ModelContext) {
         self.modelContext = modelContext
@@ -218,29 +263,47 @@ class ExerciseService {
     }
 
     private func matchWorkout(exerciseName: String) -> [Exercise] {
-        let existingWorkoutMatch = exercises.filter { $0.name.lowercased().contains(exerciseName.lowercased())}
-            .reduce((uniqueWorkoutNames: Set<String>(), list: [Exercise]())) { partialResult, exercise in
-                if partialResult.uniqueWorkoutNames.contains(exercise.name) {
-                    return partialResult
-                }
-                var uniqueNames = partialResult.uniqueWorkoutNames
-                var list = partialResult.list
-                list.append(exercise)
-                uniqueNames.insert(exercise.name)
-                return (uniqueNames, list)
+        let query = exerciseName
+
+        var mostRecentByName: [String: Exercise] = [:]
+        for ex in exercises {
+            if mostRecentByName[ex.name] == nil {
+                mostRecentByName[ex.name] = ex
             }
-            .list
-        if existingWorkoutMatch.count == 1 && exerciseName == existingWorkoutMatch.first?.name {
-            // no need to provide suggestions for the exact match
+        }
+
+        let existingNames = Array(mostRecentByName.keys)
+        let stockNames = exerciseNamesFromCSV
+        let aliasNames = aliasCandidates()
+
+        let candidates = existingNames + stockNames + aliasNames
+        let scored = Fuzzy.sort(query: query, candidates: candidates, minScore: 0.55, limit: 50)
+
+        var seen = Set<String>()
+        var result: [Exercise] = []
+
+        for (rawName, _) in scored {
+            let canonical = resolveCanonicalName(rawName)
+            if seen.contains(canonical) { continue }
+
+            if let ex = mostRecentByName[canonical] {
+                result.append(ex)
+                seen.insert(canonical)
+                continue
+            }
+
+            if stockNames.contains(canonical) {
+                let tag = exerciseNameToTagFromCSV[canonical] ?? ExerciseService.tagForExerciseName(canonical)
+                result.append(Exercise(name: canonical, type: .strength, tag: tag))
+                seen.insert(canonical)
+            }
+        }
+
+        if result.count == 1, result.first?.name.lowercased() == query.lowercased() {
             return []
         }
 
-        let stockWorkoutMatch = exerciseNamesFromCSV.filter { $0.lowercased().contains(exerciseName.lowercased()) }.map {
-            let tag = exerciseNameToTagFromCSV[$0] ?? ExerciseService.tagForExerciseName($0)
-            return Exercise(name: $0, type: .strength, tag: tag)
-        }
-
-        return existingWorkoutMatch + stockWorkoutMatch
+        return result
     }
 
     private func getMostRecentWorkout(exerciseName: String) -> Exercise? {
