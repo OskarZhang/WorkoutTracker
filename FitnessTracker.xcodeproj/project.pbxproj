@@ -35,6 +35,16 @@
 		4C1000043E00000100000002 /* CurrentRoutineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C0000043E00000100000002 /* CurrentRoutineView.swift */; };
 		4C1000053E00000100000001 /* CraftRoutineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C0000053E00000100000001 /* CraftRoutineView.swift */; };
 		4C1000063E00000100000003 /* RoutineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C0000063E00000100000003 /* RoutineView.swift */; };
+		4BF001102EAAAAAA00000001 /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BF001002EAAAAAA00000001 /* RootView.swift */; };
+		4BF001112EAAAAAA00000001 /* UserProfile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BF001012EAAAAAA00000001 /* UserProfile.swift */; };
+		4BF001122EAAAAAA00000001 /* OnboardingFlowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BF001022EAAAAAA00000001 /* OnboardingFlowView.swift */; };
+		4BF001132EAAAAAA00000001 /* VitalsStepView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BF001032EAAAAAA00000001 /* VitalsStepView.swift */; };
+		4BF001142EAAAAAA00000001 /* GoalStepView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BF001042EAAAAAA00000001 /* GoalStepView.swift */; };
+		4BF001152EAAAAAA00000001 /* GymDaysStepView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BF001052EAAAAAA00000001 /* GymDaysStepView.swift */; };
+		4BF001162EAAAAAA00000001 /* WelcomeStepView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BF001062EAAAAAA00000001 /* WelcomeStepView.swift */; };
+		4BF001172EAAAAAA00000001 /* AuthService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BF001072EAAAAAA00000001 /* AuthService.swift */; };
+		4BF001182EAAAAAA00000001 /* AuthBackend.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BF001082EAAAAAA00000001 /* AuthBackend.swift */; };
+		4BF0011B2EAAAAAA00000001 /* IntroStepView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BF001192EAAAAAA00000001 /* IntroStepView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -80,6 +90,16 @@
 		4C0000043E00000100000002 /* CurrentRoutineView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrentRoutineView.swift; sourceTree = "<group>"; };
 		4C0000053E00000100000001 /* CraftRoutineView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CraftRoutineView.swift; sourceTree = "<group>"; };
 		4C0000063E00000100000003 /* RoutineView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoutineView.swift; sourceTree = "<group>"; };
+		4BF001002EAAAAAA00000001 /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
+		4BF001012EAAAAAA00000001 /* UserProfile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models/UserProfile.swift; sourceTree = "<group>"; };
+		4BF001022EAAAAAA00000001 /* OnboardingFlowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Onboarding/OnboardingFlowView.swift; sourceTree = "<group>"; };
+		4BF001032EAAAAAA00000001 /* VitalsStepView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Onboarding/VitalsStepView.swift; sourceTree = "<group>"; };
+		4BF001042EAAAAAA00000001 /* GoalStepView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Onboarding/GoalStepView.swift; sourceTree = "<group>"; };
+		4BF001052EAAAAAA00000001 /* GymDaysStepView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Onboarding/GymDaysStepView.swift; sourceTree = "<group>"; };
+		4BF001062EAAAAAA00000001 /* WelcomeStepView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Onboarding/WelcomeStepView.swift; sourceTree = "<group>"; };
+		4BF001072EAAAAAA00000001 /* AuthService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthService.swift; sourceTree = "<group>"; };
+		4BF001082EAAAAAA00000001 /* AuthBackend.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthBackend.swift; sourceTree = "<group>"; };
+		4BF001192EAAAAAA00000001 /* IntroStepView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Onboarding/IntroStepView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -141,6 +161,16 @@
 				4BA93FC62C86B7B400973198 /* Preview Content */,
 				4BB21AA72C86D4BC00C1DEDE /* Data.swift */,
 				4B9F71D92CA4F9E5009706C6 /* CSVImporter.swift */,
+				4BF001002EAAAAAA00000001 /* RootView.swift */,
+				4BF001012EAAAAAA00000001 /* UserProfile.swift */,
+				4BF001022EAAAAAA00000001 /* OnboardingFlowView.swift */,
+				4BF001032EAAAAAA00000001 /* VitalsStepView.swift */,
+				4BF001042EAAAAAA00000001 /* GoalStepView.swift */,
+				4BF001052EAAAAAA00000001 /* GymDaysStepView.swift */,
+				4BF001062EAAAAAA00000001 /* WelcomeStepView.swift */,
+				4BF001192EAAAAAA00000001 /* IntroStepView.swift */,
+				4BF001072EAAAAAA00000001 /* AuthService.swift */,
+				4BF001082EAAAAAA00000001 /* AuthBackend.swift */,
 			);
 			path = FitnessTracker;
 			sourceTree = "<group>";
@@ -252,6 +282,16 @@
 				4C1000043E00000100000002 /* CurrentRoutineView.swift in Sources */,
 				4C1000053E00000100000001 /* CraftRoutineView.swift in Sources */,
 				4C1000063E00000100000003 /* RoutineView.swift in Sources */,
+				4BF001102EAAAAAA00000001 /* RootView.swift in Sources */,
+				4BF001112EAAAAAA00000001 /* UserProfile.swift in Sources */,
+				4BF001122EAAAAAA00000001 /* OnboardingFlowView.swift in Sources */,
+				4BF001132EAAAAAA00000001 /* VitalsStepView.swift in Sources */,
+				4BF001142EAAAAAA00000001 /* GoalStepView.swift in Sources */,
+				4BF001152EAAAAAA00000001 /* GymDaysStepView.swift in Sources */,
+				4BF001162EAAAAAA00000001 /* WelcomeStepView.swift in Sources */,
+				4BF0011B2EAAAAAA00000001 /* IntroStepView.swift in Sources */,
+				4BF001172EAAAAAA00000001 /* AuthService.swift in Sources */,
+				4BF001182EAAAAAA00000001 /* AuthBackend.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
