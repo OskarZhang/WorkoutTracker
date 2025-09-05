@@ -28,8 +28,10 @@ class AddWorkoutViewModel: ObservableObject {
         guard let selectedExercise else {
             return
         }
+        // Canonicalize selectedExercise using alias mapping before saving
+        let canonicalName = exerciseService.resolveCanonicalName(selectedExercise)
         let exercise = Exercise(
-            name: selectedExercise,
+            name: canonicalName,
             type: .strength,
             tag: selectedTag,
             sets: sets
